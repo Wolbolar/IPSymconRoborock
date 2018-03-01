@@ -1,0 +1,11 @@
+{
+    "id": "{E65614FB-B37A-219A-4876-E5676C948C33}",
+    "name": "Roborock",
+    "type": 3,
+    "vendor": "Xiaomi",
+    "aliases": ["Roborock"],
+    "parentRequirements": ["{F7DC50D6-DCE6-27CE-49B2-A363593EBB3B}"],
+    "childRequirements": [],
+    "implemented": ["{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}"],
+    "prefix": "Roborock"
+}

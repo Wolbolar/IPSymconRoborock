@@ -1,0 +1,44 @@
+{
+    "elements":
+            [
+				{ "type": "Label", "label": "Roborock I/O" }
+            ],
+    "status":
+            [
+				{
+					"code": 101,
+					"icon": "inactive",
+					"caption": "Creating instance."
+				},
+				{
+					"code": 102,
+					"icon": "active",
+					"caption": "Roborock created."
+				},
+				{
+					"code": 104,
+					"icon": "inactive",
+					"caption": "interface closed."
+				},
+				{
+					"code": 202,
+					"icon": "error",
+					"caption": "IP address must not empty."
+				},
+				{
+					"code": 203,
+					"icon": "error",
+					"caption": "No valid IP address."
+				},
+				{
+					"code": 204,
+					"icon": "error",
+					"caption": "connection to Roborock lost."
+				},
+				{
+					"code": 205,
+					"icon": "error",
+					"caption": "field must not be empty."
+				}
+            ]
+}
