@@ -104,6 +104,76 @@ Now go to the tab _Data search_. Select table _ZDEVICE_ and scroll to the right 
 __*ZTOKEN*__ . Mark the entry and set the mode to _Text_ in the field next to it and mark the entry in the right field and copy it with CTRL + C.
 The entry usually has a length of 96 characters. The contents of the clipboard are then copied to the Token field of the module's configuration form.
 
+#### Obtain Token from Android
+
+In the new app versions MiHome 5.1.1, the token is no longer stored locally. The token can only obtained up to version 5.0.19.
+If a newer version of the MIHome app is available and the token should not already be known, the only option is
+temporarily installing an older version of the MiHome app to obtain the token. After the token has been read out, the current version of the MIHome App can be used.
+An older version of the MIHome App can be found e.g. under
+
+[Mi Home 5.0.19 (Android 4.0.3+) APK Download by Xiaomi Inc. - APKMirror](https://www.apkmirror.com/apk/xiaomi-inc/mihome/mihome-5-0-19-release/mihome-5-0-19-android-apk-download/ "Mi Home 5.0.19 (Android 4.0.3+) APK Download by Xiaomi Inc. - APKMirror")
+
+With the version we can obtain the token from the MIHome App.
+
+#### Windows and Android 
+
+- First configure the Roborock in the MiHome App (for Android up to 5.0.19)
+- Then download the [MIToolkit](https://github.com/ultrara1n/MiToolkit/releases "MiToolkit") and unpack it on the hard disk
+- Activate Developer Mode and USB Debugging on the Android device and connect it to the computer with a USB cable
+- Start the MiToolkit.exe with a double click and select _Read Token_
+- On the device with the MIHome app you must now confirm the backup and here select _no password_ . It will now create a backup.
+- Then the token should be displayed in MIToolkit.
+
+#### Linux and Android
+
+First _libffi-dev_ and _libssl-dev_ must be installed.
+
+enter:
+
+  ```
+  $ sudo apt-get install libffi-dev libssl-dev
+  ```   
+
+- First configure the Roborock in the MiHome App (for Android up to 5.0.19)
+- Activate Developer Mode and USB Debugging on the Android device and connect it to the computer with a USB cable
+- Install ADB
+
+  ```
+  $ sudo apt-get install android-tools-adb
+  ``` 
+or
+
+  ```
+  $ sudo apt-get install adb
+  ``` 
+Under ADB, the device should be displayed.
+Create a backup with adb using
+
+  ```
+  $ sudo adb backup -noapk com.xiaomi.smarthome -f backup.ab
+  ``` 
+
+ [ADB Backup Extractor](https://sourceforge.net/projects/adbextractor/files/latest/download "ADB Backup Extractor") herunterladen
+
+Read the data from the backup
+
+  ```
+  $ java -jar Android\ Backup\ Utilities/Android\ Backup\ Extractor/android-backup-extractor-20171005-bin/abe.jar unpack backup.ab unpacked.tar
+  ``` 
+  
+Unpack the data
+
+  ```
+  $ tar -xvf unpacked.tar
+  ``` 
+  
+Then read the token
+
+  ```
+  $ sqlite3 apps/com.xiaomi.smarthome/db/miio2.db 'select token from devicerecord where name = "Mi Robot Vacuum";'
+  ``` 
+
+
 ### c. Konfiguration in IPS
 
 In IP-Symcon, select Add_Instance_ (_CTRL + 1_) under the category under which you want to add the instance and select _Roborock_.
