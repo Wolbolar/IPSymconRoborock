@@ -64,11 +64,11 @@ fi
 
 # install cronjob
 CRON_SCRIPT=$(basename $0)
-RUNNING=$(pgrep -f "bash $0" | wc -l)
+RUNNING=$(pgrep -f "bash.*$CRON_SCRIPT.*cronjob" | wc -l)
 if [ $RUN_BY_CRONJOB -eq 0 ]; then
     echo "installing cronjob..."
     echo "* * * * * root bash $BASEDIR/$CRON_SCRIPT --id=$INSTANCE_ID --webhook=$WEBHOOK --cronjob=1 &> /dev/null" > /etc/cron.d/symcon_mapupload
-elif [ $RUNNING -gt 1 ]; then
+elif [ $RUNNING -gt 2 ]; then
     # exit, if map uploader is already running
      echo "map uploader still running, exiting..."
      exit
