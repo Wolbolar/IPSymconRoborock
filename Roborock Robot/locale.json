@@ -140,7 +140,8 @@
       "Sunday": "Sonntag",
       "Remote Control": "Fernbedienung",
       "Setup scripts": "Skripte erstellen",
-      "Install scripts": "Installiere Skripte"
+      "Install scripts": "Installiere Skripte",
+      "Script category": "Skriptkategorie"
     }
   }
 }

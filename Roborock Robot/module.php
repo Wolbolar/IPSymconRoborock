@@ -1921,9 +1921,9 @@ Roborock_CleanSpot('.$this->InstanceID.');
 				$form,
 				[
 					[
-						'name' => 'notification_instance',
-						'type' => 'SelectInstance',
-						'caption' => 'Webfront Configurator'
+						'name' => 'script_category',
+						'type' => 'SelectCategory',
+						'caption' => 'Script category'
 					]
 				]
 			);
