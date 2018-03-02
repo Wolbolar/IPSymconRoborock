@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # config
 WEBHOOK=
 INSTANCE_ID=
@@ -63,14 +62,17 @@ if [ -z $PNM ]; then
     apt-get -y install netpbm
 fi
 
-# check cronjob
+# install cronjob
 CRON_SCRIPT=$(basename $0)
 if [ $RUN_BY_CRONJOB -eq 0 ]; then
     echo "installing cronjob..."
     echo "* * * * * root bash $BASEDIR/$CRON_SCRIPT --id=$INSTANCE_ID --webhook=$WEBHOOK --cronjob=1 &> /dev/null" > /etc/cron.d/symcon_mapupload
+else
+    # exit, if map uploader is already running
+    pgrep -f "bash $0" >/dev/null && echo "map uploader still running, exiting..." && exit
 fi
 
-# while loop, to execute map upload multiple times
+# while loop, to execute uploader multiple times per minute
 i=0
 while [ $i -lt 6 ]; do
         # check image
@@ -86,6 +88,9 @@ while [ $i -lt 6 ]; do
         # upload to webhook
         echo "uploading to webhook... $WEBHOOK?id=$INSTANCE_ID"
         curl -F "image=@$MAP_IMAGE" -F "coordinates=@$MAP_COORDINATES" "$WEBHOOK?id=$INSTANCE_ID"
+
+        # abort on manual execution
+        [ $RUN_BY_CRONJOB -eq 0 ] && exit
 
         # sleep for 10 seconds
         echo "waiting 10 seconds..."
