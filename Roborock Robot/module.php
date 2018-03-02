@@ -1591,6 +1591,7 @@ Roborock_CleanSpot('.$this->InstanceID.');
 	{
 		$token = $this->ReadPropertyString('token');
 		$token_mode = $this->ReadPropertyInteger('token_mode');
+		$setup_scripts = $this->ReadPropertyBoolean("setup_scripts");
 
 		$form = [
 			[
@@ -1901,10 +1902,33 @@ Roborock_CleanSpot('.$this->InstanceID.');
 						'name' => 'remote',
 						'type' => 'CheckBox',
 						'caption' => 'Remote Control'
+					],
+					[
+						'type' => 'Label',
+						'label' => 'Install scripts'
+					],
+					[
+						'name' => 'setup_scripts',
+						'type' => 'CheckBox',
+						'caption' => 'Setup scripts'
 					]
 				]
 			);
 		}
+
+		if ($setup_scripts) {
+			$form = array_merge_recursive(
+				$form,
+				[
+					[
+						'name' => 'notification_instance',
+						'type' => 'SelectInstance',
+						'caption' => 'Webfront Configurator'
+					]
+				]
+			);
+		}
+
 
 		return $form;
 	}

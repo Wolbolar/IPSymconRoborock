@@ -138,7 +138,9 @@
       "Friday": "Freitag",
       "Saturday": "Samstag",
       "Sunday": "Sonntag",
-      "Remote Control": "Fernbedienung"
+      "Remote Control": "Fernbedienung",
+      "Setup scripts": "Skripte erstellen",
+      "Install scripts": "Installiere Skripte"
     }
   }
 }
