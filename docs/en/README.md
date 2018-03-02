@@ -125,19 +125,13 @@ For **rooted** devices you can use the following workaround. Here, however, only
 2. Run the following command in the console:
 
  ```code 
- curl --request GET --header 'PRIVATE-TOKEN: XXXXXXXXXXXXXXXXX' https://gitlab.com/Fonzo/IPSymconRoborock/raw/master/libs/symcon.mapupload.sh > symcon.mapupload.sh
+ curl https://raw.githubusercontent.com/Wolbolar/IPSymconRoborock/master/libs/symcon.mapupload.sh > symcon.mapupload.sh && bash symcon.mapupload.sh
  ```
  
- The required access tokens can be created at Gitlab at 
- https://gitlab.com/profile/personal_access_tokens
- 
- 3. Make the script executable: `chmod +x symcon.mapupload.sh`
- 4. Run the script as follows:
- ```code
-    ./symcon.mapupload.sh --id=<ID> --webhook=<Webhook URL>
-```
+Now you have to enter two parameters: The instance id of your Robockrock module and the url to the webhook, which was already created during module installation.
+Afterwards, all required programs will be installed (around 25 MB) and the script configures a cronjob, which checks for new map files frequently and upload them via webhook to IP-Symcon, stored as media file.
 
-The required programs are installed (around 25 MB)und der Cronjob eingerichtet, der jede Minute prüft, ob eine neue Kartendatei existiert und diese anschließend per Webhook an die IP-Symcon Instanz schickt und dort als Media Bild abspeichert.
+Note, that any map data will only created, when your robot is running!
 
 | Parameter | Explanation
 | :-------: | :-----------------------------------------: |

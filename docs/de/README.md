@@ -127,18 +127,12 @@ Für **gerootete** Geräte kann man nachfolgenden Workaround nutzen.
 2. In der Konsole folgenden Befehl ausführen: 
 
  ```code 
- curl --request GET --header 'PRIVATE-TOKEN: XXXXXXXXXXXXXXXXX' https://gitlab.com/Fonzo/IPSymconRoborock/raw/master/libs/symcon.mapupload.sh > symcon.mapupload.sh
+curl https://raw.githubusercontent.com/Wolbolar/IPSymconRoborock/master/libs/symcon.mapupload.sh > symcon.mapupload.sh && bash symcon.mapupload.sh 
  ```
- 
- Den benötigten Zugriffs-Token kann man bei Gitlab unter https://gitlab.com/profile/personal_access_tokens anlegen.
- 
- 3. Das Script ausführbar machen: `chmod +x symcon.mapupload.sh`
- 4. Das Script wie folgt ausführen:
- ```code
-    ./symcon.mapupload.sh --id=<ID> --webhook=<Webhook URL>
-```
+  
+Nun werden als erstes 2 Parameter abgefragt: die IP-Symcon Instanz des Roborock Moduls und die URL des durch das Modul angelegten Webhooks. Anschließend werden die benötigte Programme installiert (rund 25 MB) und der Cronjob eingerichtet, welcher regelmäßig prüft, ob eine neue Kartendatei existiert und diese anschließend per Webhook an die IP-Symcon Instanz schickt und dort als Media Bild abspeichert.
 
-Dabei werden die benötigte Programme installiert (rund 25 MB) und der Cronjob eingerichtet, der jede Minute prüft, ob eine neue Kartendatei existiert und diese anschließend per Webhook an die IP-Symcon Instanz schickt und dort als Media Bild abspeichert.
+Die Kartendateien werden nur dann erstellt, wenn der Sauger auch läuft!
 
 | Parameter | Erklärung                                   |
 | :-------: | :-----------------------------------------: |
