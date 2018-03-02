@@ -4,15 +4,9 @@ WEBHOOK=
 INSTANCE_ID=
 RUN_BY_CRONJOB=0
 
-# map data
-MAP_FILE=$(find /run/shm -type f -name "*.ppm" | head -1)
-MAP_COORDINATES=/run/shm/SLAM_fprintf.log
-
 # variables
 PNM=$(command -v pnmtopng)
 BASEDIR=$(dirname -- $(readlink -e "$0"))
-MAP_FOLDER=$(dirname -- "$MAP_FILE")
-MAP_IMAGE="$MAP_FOLDER/latest.png"
 
 # handle arguments
 for i in "$@"
@@ -77,6 +71,12 @@ fi
 # while loop, to execute uploader multiple times per minute
 i=0
 while [ $i -lt 6 ]; do
+        # map data
+        MAP_FILE=$(find /run/shm -type f -name "*.ppm" | head -1)
+        MAP_COORDINATES=/run/shm/SLAM_fprintf.log
+        MAP_FOLDER=$(dirname -- "$MAP_FILE")
+        MAP_IMAGE="$MAP_FOLDER/latest.png"
+
         # check image
         if [ -z $MAP_FILE ]; then
             echo 'no map file found, exiting...';
