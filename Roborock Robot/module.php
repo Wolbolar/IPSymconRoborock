@@ -455,7 +455,7 @@ class Roborock extends IPSModule
 			$this->SetStatus(209);
 			return false;
 		} else {
-        	$this->SetupScripts();
+			$this->SetupScripts();
 		}
 
 		// yay, configuration is valid! =)
@@ -511,7 +511,7 @@ class Roborock extends IPSModule
 	private function CreateStartScript()
 	{
 		$Script = '<?
-Roborock_Start('.$this->InstanceID.');		
+Roborock_Start(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -519,7 +519,7 @@ Roborock_Start('.$this->InstanceID.');
 	private function CreateStopScript()
 	{
 		$Script = '<?
-Roborock_Stop('.$this->InstanceID.');		
+Roborock_Stop(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -527,7 +527,7 @@ Roborock_Stop('.$this->InstanceID.');
 	private function CreatePauseScript()
 	{
 		$Script = '<?
-Roborock_Pause('.$this->InstanceID.');		
+Roborock_Pause(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -535,7 +535,7 @@ Roborock_Pause('.$this->InstanceID.');
 	private function CreateLocateScript()
 	{
 		$Script = '<?
-Roborock_Locate('.$this->InstanceID.');		
+Roborock_Locate(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -543,7 +543,7 @@ Roborock_Locate('.$this->InstanceID.');
 	private function CreateChargeScript()
 	{
 		$Script = '<?
-Roborock_Charge('.$this->InstanceID.');		
+Roborock_Charge(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -551,7 +551,7 @@ Roborock_Charge('.$this->InstanceID.');
 	private function CreateCleanSpotScript()
 	{
 		$Script = '<?
-Roborock_CleanSpot('.$this->InstanceID.');		
+Roborock_CleanSpot(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -2317,6 +2317,28 @@ EOF;
 	}
 
 	/**
+	 * Get description timer day
+	 * @param $day_of_week
+	 * @return string
+	 */
+	private function _getTimerDay($day_of_week)
+	{
+		if ($day_of_week == "*") {
+			$timer_day = "once";
+		} elseif ($day_of_week == "1,2,3,4,5") {
+			$timer_day = "weekdays";
+		} elseif ($day_of_week == "0,6") {
+			$timer_day = "weekends";
+		} elseif ($day_of_week == "0,1,2,3,4,5,6") {
+			$timer_day = "every day";
+		} else {
+			$timer_day = "custom";
+		}
+		$timer_day = $this->Translate($timer_day);
+		return $timer_day;
+	}
+
+	/**
 	 * get token by discovering 192.168.8.1
 	 * @return bool
 	 */
@@ -2900,10 +2922,57 @@ EOF;
 	{
 		if (isset($data['result'])) {
 			$timers = $data['result'];
-			$this->SetRoborockValue('timer_details', json_encode($timers));
+			$timer_list = array();
+			foreach ($timers as $key => $timer) {
+				$setuptime = $timer[0];// setup time of this schedule (Unix time)
+				// $setuptimestring = date('h:i:s',$setuptime);
+				$timer_active = $timer[1];// Is this schedule active
+				$timing = $timer[2];
+				$time_detail = $timing[0];
+				$command = $timing[1][0];
+				// $unknown = $timing[1][1];
+				$timer_data = explode(" ", $time_detail);
+				$minute = $timer_data[0];
+				if ($minute == "0") {
+					$minute = "00";
+				}
+				$hour = $timer_data[1];
+				$day_of_month = $timer_data[2];
+				$month = $timer_data[3];
+				$day_of_week = $timer_data[4];
+				$repetition = $this->_getTimerDay($day_of_week);
+				$time_string = $hour . ":" . $minute;
+
+				$timer_entry[] = [
+					$time_string . '<br>' . $repetition,
+					$timer_active
+				];
+				$timer_list[$setuptime]["timer_active"] = $timer_active;
+				$timer_list[$setuptime]["minute"] = $minute;
+				$timer_list[$setuptime]["hour"] = $hour;
+				$timer_list[$setuptime]["day_of_month"] = $day_of_month;
+				$timer_list[$setuptime]["month"] = $month;
+				$timer_list[$setuptime]["time_string"] = $time_string;
+				$timer_list[$setuptime]["repetition"] = $repetition;
+				$timer_list[$setuptime]["command"] = $command;
+			}
+
+			// build html table
+			$html = $this->_convertDataToTable([
+				'table' => [
+					'head' => [
+						$this->Translate('Timer'),
+						$this->Translate('Status'),
+					],
+					'body' => $timer_entry
+				]
+			]);
+
+			// save html table
+			$this->SetRoborockValue('timer_details', $html);
 
 			// return values
-			return $timers;
+			return $timer_list;
 		}
 
 		// fallback

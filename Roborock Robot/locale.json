@@ -141,7 +141,12 @@
       "Remote Control": "Fernbedienung",
       "Setup scripts": "Skripte erstellen",
       "Install scripts": "Installiere Skripte",
-      "Script category": "Skriptkategorie"
+      "Script category": "Skriptkategorie",
+      "once": "einmalig",
+      "weekdays": "Wochentags",
+      "weekends": "Wochenenden",
+      "every day": "jeden Tag",
+      "custom": "Benutzerdefiniert"
     }
   }
 }
