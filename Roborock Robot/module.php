@@ -954,32 +954,28 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 		return $this->RequestData('close_dnd_timer');
 	}
 
-	/** @ToDo: Set Timer
-	 * set timer
-	 * @return bool
-	 */
-	public function Set_Timer()
-	{
-		return $this->RequestData('set_timer');
-	}
 
-	/* @todo
-	Set Cleaning Timer Details
-	 * Command
-	 * Key    Value    Comment
-	 * method    set_timer
-	 * params    [[Time in miliseconds , [schedule, [command,parameter]]]]    See above for the schedule settings . Time in MS is used as sort of record id
-	 * id    [Integer]    is returned in the response used to link the send message to the response.
-	 * Example
-	 * {'id': 1, 'method': 'set_timer', 'params': [['1498595904821",["30 12 * * 1,2,3,4,5",["start_clean","']]]] }
+	/**
+	 * Set Timer
+	 * @param int $hour two digits
+	 * @param int $minute two digits
+	 * @param string $repetition once|weekdays|weekends|every day
+	 * @return array|bool
 	 */
+	public function Set_Timer(int $hour, int $minute, string $repetition)
+	{
+		$timerid = time();
+		return $this->RequestData('set_timer', [
+			'params' => [[$timerid,[$minute.' '.$hour.' * * '.$this->_getTimerRepetition($repetition),['start_clean','']]]]
+		]);
+	}
 
 	/**
 	 * enable timer
 	 * @param $timerid
 	 * @return bool
 	 */
-	protected function EnableTimer($timerid)
+	public function EnableTimer(string $timerid)
 	{
 		return $this->RequestData('upd_timer', [
 			'params' => [$timerid, 'on']
@@ -991,7 +987,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	 * @param $timerid
 	 * @return bool
 	 */
-	protected function DisableTimer($timerid)
+	public function DisableTimer(string $timerid)
 	{
 		return $this->RequestData('upd_timer', [
 			'params' => [$timerid, 'off']
@@ -1012,7 +1008,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	 * @param $timerid
 	 * @return bool
 	 */
-	protected function DeleteTimer($timerid)
+	public function DeleteTimer(string $timerid)
 	{
 		return $this->RequestData('del_timer', [$timerid]);
 	}
@@ -2336,6 +2332,28 @@ EOF;
 		}
 		$timer_day = $this->Translate($timer_day);
 		return $timer_day;
+	}
+
+
+	/**
+	 * Get repetition for timer
+	 * @param $repetitionstring
+	 * @return string
+	 */
+	private function _getTimerRepetition($repetitionstring)
+	{
+		if ($repetitionstring == "once") {
+			$repetition = "*";
+		} elseif ($repetitionstring == "weekdays") {
+			$repetition = "1,2,3,4,5";
+		} elseif ($repetitionstring == "weekends") {
+			$repetition = "0,6";
+		} elseif ($repetitionstring == "every day") {
+			$repetition = "0,1,2,3,4,5,6";
+		} else {
+			$repetition = "*";
+		}
+		return $repetition;
 	}
 
 	/**
