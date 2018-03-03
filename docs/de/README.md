@@ -208,6 +208,19 @@ Die Kartendateien werden nur dann erstellt, wenn der Sauger auch läuft!
 | ID | Instanz ID des Robots in IP-Symcon |
 | Webhook URL | URL zum Webhook, z.B. http://10.0.0.1:3777/hook/Roborock <br /> Der Webhook _Roborock_ wird automatisch angelegt. |
 
+Webfront:
+
+![Map](img/map.png?raw=true "Map")
+
+Der rote Punkt stellt dabei die aktuelle Position des Staubsaugers dar.
+
+### Webfront Ansicht
+
+![Webfront 1](img/webfront1.png?raw=true "Webfront 1")
+
+![Webfront 2](img/webfront2.png?raw=true "Webfront 2")
+
+
 ## 4. Funktionsreferenz
 
 ### Roborock Staubsauger Roboter:

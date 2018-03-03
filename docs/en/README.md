@@ -208,7 +208,19 @@ Note, that any map data will only created, when your robot is running!
 | ID | Instance ID from the robot in IP-Symcon |
 | Webhook URL | URL of the Webhook, etc. http://10.0.0.1:3777/hook/Roborock <br /> The Webhook _Roborock_ will be created automatically. |
 
-## 4. Funktion reference
+Webfront:
+
+![Map](img/map.png?raw=true "Map")
+
+The red dot represents the current position of the vacuum cleaner.
+
+### Webfront Screen
+
+![Webfront 1](img/webfront1.png?raw=true "Webfront 1")
+
+![Webfront 2](img/webfront2.png?raw=true "Webfront 2")
+
+## 4. Function reference
 
 ### Roborock Vacuum Cleaner:
 
@@ -308,7 +320,7 @@ Returns:
          
   Parameter _$InstanceID_ __*ObjectID*__ from the Roborock instance     
 
-## 5. Konfiguration:
+## 5. Configuration:
 
 ### Properties:
 
