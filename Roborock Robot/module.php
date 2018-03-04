@@ -450,11 +450,11 @@ class Roborock extends IPSModule
 			}
 		}
 
-		// check token
+        // check category
 		if ($this->ReadPropertyBoolean("setup_scripts") && $this->ReadPropertyInteger("script_category") == 0) {
 			$this->SetStatus(209);
 			return false;
-		} else {
+        } else if ($this->ReadPropertyBoolean("setup_scripts")) {
 			$this->SetupScripts();
 		}
 
