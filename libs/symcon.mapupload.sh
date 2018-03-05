@@ -53,7 +53,7 @@ if [ -z $PNM ]; then
     apt-get update &> /dev/null
 
     echo "installing dependencies...";
-    apt-get -y install netpbm
+    apt-get -y install netpbm curl
 fi
 
 # install cronjob
