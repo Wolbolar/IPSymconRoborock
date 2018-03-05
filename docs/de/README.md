@@ -480,3 +480,4 @@ GUID: `{E65614FB-B37A-219A-4876-E5676C948C33}`
 ### c. Quellen
 
 [OpenMiHome](https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md "OpenMiHome") _Wolfgang Frisch_ (GPLv3)
+[Dustcloud](https://github.com/dgiese/dustcloud/blob/master/devices/xiaomi.vacuum/UPDATE-howto.md "Dustcloud")
