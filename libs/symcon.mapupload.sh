@@ -68,12 +68,12 @@ elif [ $RUNNING -gt 2 ]; then
      exit
 fi
 
-# while loop, to execute uploader multiple times per minute
-i=0
-while [ $i -lt 6 ]; do
+# while loop, to execute uploader every second
+while true
+do
         # map data
         MAP_FILE=$(find /run/shm -type f -name "*.ppm" | head -1)
-        MAP_COORDINATES=/run/shm/SLAM_fprintf.log
+        MAP_COORDINATES=$(find /run/shm -type f -name "SLAM_fprintf.log" | head -1)
         MAP_FOLDER=$(dirname -- "$MAP_FILE")
         MAP_IMAGE="$MAP_FOLDER/latest.png"
 
@@ -83,19 +83,27 @@ while [ $i -lt 6 ]; do
             exit
         fi
 
+        # check coordinates file
+        if [ -z $MAP_COORDINATES ]; then
+            echo 'no coordinates file found, exiting...';
+            exit
+        fi
+
+        # copy coordinate files to tmp dir
+        cp $MAP_COORDINATES /tmp/SLAM_fprint.log
+
         # convert image to jpg
         echo "converting ppm to png..."
         $PNM -transparent rgb:7D/7D/7D $MAP_FILE &> /dev/null > $MAP_IMAGE
 
         # upload to webhook
         echo "uploading to webhook... $WEBHOOK?id=$INSTANCE_ID"
-        curl -F "image=@$MAP_IMAGE" -F "coordinates=@$MAP_COORDINATES" "$WEBHOOK?id=$INSTANCE_ID"
+        curl -F "image=@$MAP_IMAGE" -F "coordinates=@/tmp/SLAM_fprint.log" "$WEBHOOK?id=$INSTANCE_ID"
 
         # abort on manual execution
         [ $RUN_BY_CRONJOB -eq 0 ] && exit
 
-        # sleep for 10 seconds
-        echo "waiting 10 seconds..."
-        sleep 10
-        i=$(( i + 1 ))
+        # sleep for 1 second
+        echo "waiting 1 second..."
+        sleep 1
 done
