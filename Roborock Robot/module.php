@@ -450,11 +450,11 @@ class Roborock extends IPSModule
 			}
 		}
 
-        // check category
+		// check category
 		if ($this->ReadPropertyBoolean("setup_scripts") && $this->ReadPropertyInteger("script_category") == 0) {
 			$this->SetStatus(209);
 			return false;
-        } else if ($this->ReadPropertyBoolean("setup_scripts")) {
+		} else if ($this->ReadPropertyBoolean("setup_scripts")) {
 			$this->SetupScripts();
 		}
 
@@ -966,7 +966,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	{
 		$timerid = time();
 		return $this->RequestData('set_timer', [
-			'params' => [[$timerid,[$minute.' '.$hour.' * * '.$this->_getTimerRepetition($repetition),['start_clean','']]]]
+			'params' => [[$timerid, [$minute . ' ' . $hour . ' * * ' . $this->_getTimerRepetition($repetition), ['start_clean', '']]]]
 		]);
 	}
 
@@ -2940,57 +2940,65 @@ EOF;
 	{
 		if (isset($data['result'])) {
 			$timers = $data['result'];
-			$timer_list = array();
-			foreach ($timers as $key => $timer) {
-				$setuptime = $timer[0];// setup time of this schedule (Unix time)
-				// $setuptimestring = date('h:i:s',$setuptime);
-				$timer_active = $timer[1];// Is this schedule active
-				$timing = $timer[2];
-				$time_detail = $timing[0];
-				$command = $timing[1][0];
-				// $unknown = $timing[1][1];
-				$timer_data = explode(" ", $time_detail);
-				$minute = $timer_data[0];
-				if ($minute == "0") {
-					$minute = "00";
-				}
-				$hour = $timer_data[1];
-				$day_of_month = $timer_data[2];
-				$month = $timer_data[3];
-				$day_of_week = $timer_data[4];
-				$repetition = $this->_getTimerDay($day_of_week);
-				$time_string = $hour . ":" . $minute;
+			if (empty($timers)) {
+				// save html table
+				$this->SetRoborockValue('timer_details', "");
+				return array("timer" => "no timer set");
 
-				$timer_entry[] = [
-					$time_string . '<br>' . $repetition,
-					$timer_active
-				];
-				$timer_list[$setuptime]["timer_active"] = $timer_active;
-				$timer_list[$setuptime]["minute"] = $minute;
-				$timer_list[$setuptime]["hour"] = $hour;
-				$timer_list[$setuptime]["day_of_month"] = $day_of_month;
-				$timer_list[$setuptime]["month"] = $month;
-				$timer_list[$setuptime]["time_string"] = $time_string;
-				$timer_list[$setuptime]["repetition"] = $repetition;
-				$timer_list[$setuptime]["command"] = $command;
+			} else {
+				$timer_list = array();
+				foreach ($timers as $key => $timer) {
+					$setuptime = $timer[0];// setup time of this schedule (Unix time)
+					// $setuptimestring = date('h:i:s',$setuptime);
+					$timer_active = $timer[1];// Is this schedule active
+					$timing = $timer[2];
+					$time_detail = $timing[0];
+					$command = $timing[1][0];
+					// $unknown = $timing[1][1];
+					$timer_data = explode(" ", $time_detail);
+					$minute = $timer_data[0];
+					if ($minute == "0") {
+						$minute = "00";
+					}
+					$hour = $timer_data[1];
+					$day_of_month = $timer_data[2];
+					$month = $timer_data[3];
+					$day_of_week = $timer_data[4];
+					$repetition = $this->_getTimerDay($day_of_week);
+					$time_string = $hour . ":" . $minute;
+
+					$timer_entry[] = [
+						$time_string . '<br>' . $repetition,
+						$timer_active
+					];
+					$timer_list[$setuptime]["timer_active"] = $timer_active;
+					$timer_list[$setuptime]["minute"] = $minute;
+					$timer_list[$setuptime]["hour"] = $hour;
+					$timer_list[$setuptime]["day_of_month"] = $day_of_month;
+					$timer_list[$setuptime]["month"] = $month;
+					$timer_list[$setuptime]["time_string"] = $time_string;
+					$timer_list[$setuptime]["repetition"] = $repetition;
+					$timer_list[$setuptime]["command"] = $command;
+				}
+
+				// build html table
+				$html = $this->_convertDataToTable([
+					'table' => [
+						'head' => [
+							$this->Translate('Timer'),
+							$this->Translate('Status'),
+						],
+						'body' => $timer_entry
+					]
+				]);
+
+				// save html table
+				$this->SetRoborockValue('timer_details', $html);
+
+				// return values
+				return $timer_list;
 			}
 
-			// build html table
-			$html = $this->_convertDataToTable([
-				'table' => [
-					'head' => [
-						$this->Translate('Timer'),
-						$this->Translate('Status'),
-					],
-					'body' => $timer_entry
-				]
-			]);
-
-			// save html table
-			$this->SetRoborockValue('timer_details', $html);
-
-			// return values
-			return $timer_list;
 		}
 
 		// fallback
