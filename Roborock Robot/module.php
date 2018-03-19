@@ -3032,7 +3032,11 @@ EOF;
 	{
 		if (isset($data['result'][0])) {
 			$volume = $data['result'][0];
-			$this->SetRoborockValue('volume', $volume);
+			$type = gettype($volume);
+			if ($type == "integer") {
+				$this->SetRoborockValue('volume', $volume);
+			}
+
 
 			return $volume;
 		}
