@@ -473,13 +473,15 @@ _**Liest die Anzahl der Reinigungen aus**_
 _**Reinigt in der Zone der angebenen Koordinaten**_
           
  ```php
- Roborock_ZoneClean(integer $InstanceID, integer $lower_left_corner, integer $upper_right_corner, integer $number);
+ Roborock_ZoneClean(integer $InstanceID, integer $lower_left_corner_x, integer $lower_left_corner_y, integer $upper_right_corner_x, integer $upper_right_corner_y, integer $number);
  ```   
          
  Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz 
  
- Parameter _$lower_left_corner_ __Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck) 
- Parameter _$upper_right_corner_ __Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+ Parameter _$lower_left_corner_x_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+ Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+ Parameter _$upper_right_corner_x_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+ Parameter _$upper_right_corner_y_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
  Parameter _$number_ __Anzahl der Reinigungen__ 
  
 _**Fährt zu den angegebenen Koordinaten**_
