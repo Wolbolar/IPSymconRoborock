@@ -1134,13 +1134,32 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	// @ToDo: get valid coordinates, send parameters
 
 	/**
-	 * Roborock Vacuum 2 clean zone with coordinates for area
+	 * Roborock Vacuum 2 clean zone with coordinates for area, use a rectangle with values for the lower left corner  und the upper right corner
 	 * @return bool
 	 */
-	public function AppZoneClean()
+	public function ZoneClean(int $lower_left_corner, int $upper_right_corner, int $number)
 	{
-		return $this->RequestData('app_zoned_clean');
-		// {"id":8338,"method":"app_zoned_clean","params":[[26234,26042,27284,26642,2],[26232,25304,27282,25804,2],[26246,24189,27296,25139,2]]}
+		return $this->RequestData('app_zoned_clean', [
+		'params' => [
+			$lower_left_corner,
+			$upper_right_corner,
+			$number
+	]
+		]);
+	}
+
+	/**
+	 * Roborock Vacuum 2 go to coordinates
+	 * @return bool
+	 */
+	public function GotoTarget(int $x, int $y)
+	{
+		return $this->RequestData('app_goto_target', [
+			'params' => [
+				$x,
+				$y
+			]
+		]);
 	}
 
 	/**

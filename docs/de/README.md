@@ -469,6 +469,30 @@ _**Liest die Anzahl der Reinigungen aus**_
  ```   
          
  Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz     
+ 
+_**Reinigt in der Zone der angebenen Koordinaten**_
+          
+ ```php
+ Roborock_ZoneClean(integer $InstanceID, integer $lower_left_corner, integer $upper_right_corner, integer $number);
+ ```   
+         
+ Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz 
+ 
+ Parameter _$lower_left_corner_ __Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck) 
+ Parameter _$upper_right_corner_ __Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+ Parameter _$number_ __Anzahl der Reinigungen__ 
+ 
+_**Fährt zu den angegebenen Koordinaten**_
+          
+ ```php
+ Roborock_GotoTarget(integer $InstanceID, integer $x, integer $y);
+ ```   
+         
+ Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz
+ 
+ Parameter _$x_ __*X-Koordinate*__ der Zielposition
+ 
+ Parameter _$y_ __*Y-Koordinate*__ der Zielposition  
 
 
 ###  b. GUIDs und Datenaustausch:
