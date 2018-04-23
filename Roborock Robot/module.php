@@ -236,6 +236,9 @@ class Roborock extends IPSModule
 			$this->UnregisterVariable('remote');
 		}
 
+        // Current Coordinates
+        $this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '~String', 98);
+
 		// command
 		$this->RegisterVariableInteger('command', $this->Translate('command'), 'Roborock.Command', $this->_getPosition());
         $this->EnableAction('command');
@@ -3143,12 +3146,6 @@ EOF;
      */
     protected function coordinates_callback(array $data)
     {
-        // register coordinates variable
-        if (!@$this->GetIDForIdent('coordinates')) {
-            $this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '~String', 98);
-        }
-
-        // update coordinates
         $this->SetValue('coordinates', 'x: ' . $data['x'] . ' y: ' . $data['y'] * 20);
     }
 
