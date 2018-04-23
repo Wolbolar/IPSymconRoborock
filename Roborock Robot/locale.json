@@ -146,7 +146,8 @@
       "weekdays": "Wochentags",
       "weekends": "Wochenenden",
       "every day": "jeden Tag",
-      "custom": "Benutzerdefiniert"
+      "custom": "Benutzerdefiniert",
+      "Current Coordinates": "Aktuelle Koordinaten"
     }
   }
 }

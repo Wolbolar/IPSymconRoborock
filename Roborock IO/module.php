@@ -115,6 +115,7 @@ class RoborockIO extends IPSModule
 
     /**
      * Queue Handler
+     * @return void
      */
     public function HandleQueue()
     {
@@ -135,7 +136,7 @@ class RoborockIO extends IPSModule
 
                 // break loop on invalid requests
                 if (!$buffer) {
-                    return false;
+                    return;
                 }
 
                 // append data
@@ -725,6 +726,10 @@ class RoborockIO extends IPSModule
                         $im = imagerotate($im, -90, $transparent, true);
 
                         // convert coordinates from file to points
+                        $x = 0;
+                        $y = 0;
+                        $img_x = 0;
+                        $img_y = 0;
                         foreach (file($_FILES['coordinates']['tmp_name']) AS $line) {
                             if (strstr($line, 'estimate')) {
                                 $d = explode('estimate', $line);
@@ -733,16 +738,16 @@ class RoborockIO extends IPSModule
                                 list($y, $x) = explode(' ', $d, 3);
 
                                 // calculate pixel from center of the image, with offset
-                                $x = $center_x + ($x * 20);
-                                $y = $center_y + ($y * 20);
+                                $img_x = $center_x + ($x * 20);
+                                $img_y = $center_y + ($y * 20);
 
                                 // draw pixel to image
-                                imagesetpixel($im, $x, $y, imagecolorallocate($im, 125, 125, 125));
+                                imagesetpixel($im, $img_x, $img_y, imagecolorallocate($im, 125, 125, 125));
                             }
                         }
 
                         // draw current position
-                        imagefilledellipse($im, $x, $y - 3, 8, 8, imagecolorallocate($im, 220, 0, 0));
+                        imagefilledellipse($im, $img_x, $img_y - 3, 8, 8, imagecolorallocate($im, 220, 0, 0));
 
                         // rotate image back by 90°
                         $im = imagerotate($im, 90, $transparent, true);
@@ -779,6 +784,20 @@ class RoborockIO extends IPSModule
                         // update media content
                         IPS_SetMediaFile($media_id, $media_file, false);
                         IPS_SetMediaContent($media_id, base64_encode(file_get_contents($_FILES['image']['tmp_name'])));
+
+                        // send coordinates to children
+                        if ($x && $y) {
+                            $this->SendDataToChildren(json_encode([
+                                'DataID' => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
+                                'InstanceID' => (int)$instance_id,
+                                'Buffer' => [
+                                    'token' => false,
+                                    'method' => 'coordinates',
+                                    'x' => $x,
+                                    'y' => $y
+                                ]
+                            ]));
+                        }
                     }
 
                     // unlink temp files
@@ -828,8 +847,8 @@ class RoborockIO extends IPSModule
 
     /**
      * Polyfill for IP-Symcon 4.4 and older
-     * @param $Ident
-     * @param $Value
+     * @param string $Ident
+     * @param mixed $Value
      */
     protected function SetValue($Ident, $Value)
     {
