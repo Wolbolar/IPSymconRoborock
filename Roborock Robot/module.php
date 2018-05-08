@@ -125,7 +125,7 @@ class Roborock extends IPSModule
 		$this->RegisterPropertyBoolean('remote', false);
 
 		$this->RegisterPropertyInteger('notification_instance', 0);
-        $this->RegisterPropertyString('notifications', $this->GetPushNotifications());
+		$this->RegisterPropertyString('notifications', $this->GetPushNotifications());
 		$this->RegisterPropertyBoolean('setup_scripts', false);
 		$this->RegisterPropertyInteger('script_category', 0);
 
@@ -218,7 +218,7 @@ class Roborock extends IPSModule
 		$this->RegisterProfile('Roborock.Cleanarea', 'Shuffle', '', " " . chr(109) . chr(178), 0, 0, 0, 1, 2);
 		$this->RegisterProfile('Roborock.Totalcleans', 'Gauge', '', '', 0, 0, 0, 2, 1);
 		$this->RegisterProfile('Roborock.Volume', 'Speaker', '', " %", 0, 100, 1, 0, 1);
-        $this->RegisterProfile('Roborock.Battery', 'Battery', '', " %", 0, 100, 1, 0, 1);
+		$this->RegisterProfile('Roborock.Battery', 'Battery', '', " %", 0, 100, 1, 0, 1);
 
 		// hidden, internal variables
 		$variable_notification_id = $this->RegisterVariableString('last_notification_state', 'last_notification_state', '', 99);
@@ -236,15 +236,15 @@ class Roborock extends IPSModule
 			$this->UnregisterVariable('remote');
 		}
 
-        // Current Coordinates
-        $this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '~String', 98);
+		// Current Coordinates
+		$this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '~String', 98);
 
 		// command
 		$this->RegisterVariableInteger('command', $this->Translate('command'), 'Roborock.Command', $this->_getPosition());
-        $this->EnableAction('command');
+		$this->EnableAction('command');
 
-        // current state
-        $this->RegisterVariableInteger('state', $this->Translate('State'), 'Roborock.State', $this->_getPosition());
+		// current state
+		$this->RegisterVariableInteger('state', $this->Translate('State'), 'Roborock.State', $this->_getPosition());
 
 		// current battery level
 		$this->RegisterVariableInteger('battery', $this->Translate('Battery'), 'Roborock.Battery', $this->_getPosition());
@@ -1135,34 +1135,88 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	}
 
 	/**
+	 * Update Firmware Over Air
+	 * @param string $firmware
+	 * @return array|bool
+	 */
+	public function UpdateFirmwareOverAir(string $firmware)
+	{
+		$ip = $this->GetHostIP();
+		$port = 3777;
+		return $this->RequestData('miIO.ota', [
+			'params' => [
+				'mode' => 'normal',
+				'install' => '1',
+				'app_url' => 'http://' . $ip . ':' . $port . '/user/roborock/' . $firmware,
+				'file_md5' => md5($firmware),
+				'proc' => 'dnld install'
+			]
+		]);
+	}
+
+	/**
+	 * Get IP IP-Symcon
+	 * @return string
+	 */
+	protected function GetHostIP()
+	{
+		$ip = exec("sudo ifconfig eth0 | grep 'inet Adresse:' | cut -d: -f2 | awk '{ print $1}'");
+		if ($ip == "") {
+			$ipinfo = Sys_GetNetworkInfo();
+			$ip = $ipinfo[0]['IP'];
+		}
+		return $ip;
+	}
+
+	/**
+	 * Update Firmware Over Air Progress
+	 * @return array|bool
+	 */
+	public function UpdateFirmwareOverAirProgress()
+	{
+		$ota_progress = $this->RequestData('miIO.get_ota_progress')[0];
+		return $ota_progress;
+	}
+
+	/**
+	 * Update Firmware Over Air Status
+	 * @return array|bool
+	 */
+	public function UpdateFirmwareOverAirStatus()
+	{
+		$ota_state = $this->RequestData('miIO.get_ota_state')[0];
+		return $ota_state;
+	}
+
+	/**
 	 * Roborock Vacuum 2 clean zone with coordinates for area, use a rectangle with values for the lower left corner and the upper right corner
-     * @param int $lower_left_corner_x
-     * @param int $lower_left_corner_y
-     * @param int $upper_right_corner_x
-     * @param int $upper_right_corner_y
-     * @param int $number
+	 * @param int $lower_left_corner_x
+	 * @param int $lower_left_corner_y
+	 * @param int $upper_right_corner_x
+	 * @param int $upper_right_corner_y
+	 * @param int $number
 	 * @return bool
 	 */
 	public function ZoneClean(int $lower_left_corner_x, int $lower_left_corner_y, int $upper_right_corner_x, int $upper_right_corner_y, int $number)
 	{
 		return $this->RequestData('app_zoned_clean', [
-		'params' => [
-			$lower_left_corner_x,
-			$lower_left_corner_y,
-			$upper_right_corner_x,
-			$upper_right_corner_y,
-			$number
-	]
+			'params' => [
+				$lower_left_corner_x,
+				$lower_left_corner_y,
+				$upper_right_corner_x,
+				$upper_right_corner_y,
+				$number
+			]
 		]);
 	}
 
 	/**
 	 * Roborock Vacuum 2 go to coordinates
-     * @param float $x
-     * @param float $y
+	 * @param float $x
+	 * @param float $y
 	 * @return bool
 	 */
-    public function GotoTarget(float $x, float $y)
+	public function GotoTarget(float $x, float $y)
 	{
 		return $this->RequestData('app_goto_target', [
 			'params' => [
@@ -3140,14 +3194,14 @@ EOF;
 		return isset($data['result'][0]) ? $data['result'][0] : false;
 	}
 
-    /**
-     * Callback: Current Coordinates
-     * @param array $data
-     */
-    protected function coordinates_callback(array $data)
-    {
-        $this->SetValue('coordinates', 'x: ' . $data['x'] . ' y: ' . $data['y'] * 20);
-    }
+	/**
+	 * Callback: Current Coordinates
+	 * @param array $data
+	 */
+	protected function coordinates_callback(array $data)
+	{
+		$this->SetValue('coordinates', 'x: ' . $data['x'] . ' y: ' . $data['y'] * 20);
+	}
 
 	/***********************************************************
 	 * Migrations
