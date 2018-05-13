@@ -237,7 +237,7 @@ class Roborock extends IPSModule
 		}
 
 		// Current Coordinates
-		$this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '~String', 98);
+		$this->RegisterVariableString('coordinates', $this->Translate('Current Coordinates'), '', 98);
 
 		// command
 		$this->RegisterVariableInteger('command', $this->Translate('command'), 'Roborock.Command', $this->_getPosition());
@@ -328,7 +328,7 @@ class Roborock extends IPSModule
 
 		// serial number
 		if ($this->ReadPropertyBoolean('serial_number')) {
-			$id = $this->RegisterVariableString('serial_number', $this->Translate('Serial Number'), '~String', $this->_getPosition());
+			$id = $this->RegisterVariableString('serial_number', $this->Translate('Serial Number'), '', $this->_getPosition());
 			IPS_SetIcon($id, 'Robot');
 			// $this->EnableAction('serial_number');
 		} else {
