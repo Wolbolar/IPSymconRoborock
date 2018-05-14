@@ -1200,12 +1200,12 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	public function ZoneClean(int $lower_left_corner_x, int $lower_left_corner_y, int $upper_right_corner_x, int $upper_right_corner_y, int $number)
 	{
 		return $this->RequestData('app_zoned_clean', [
-			'params' => [
+			'params' => [[
 				$lower_left_corner_x,
 				$lower_left_corner_y,
 				$upper_right_corner_x,
 				$upper_right_corner_y,
-				$number
+				$number]
 			]
 		]);
 	}
