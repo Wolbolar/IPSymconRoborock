@@ -112,6 +112,7 @@ class Roborock extends IPSModule
 		$this->RegisterPropertyBoolean('fan_power', false);
 		$this->RegisterPropertyBoolean('error_code', false);
 		$this->RegisterPropertyBoolean('consumables', false);
+		$this->RegisterPropertyBoolean('consumables_separate', false);
 		$this->RegisterPropertyBoolean('dnd_mode', false);
 		$this->RegisterPropertyBoolean('clean_area', false);
 		$this->RegisterPropertyBoolean('clean_time', false);
@@ -219,6 +220,7 @@ class Roborock extends IPSModule
 		$this->RegisterProfile('Roborock.Totalcleans', 'Gauge', '', '', 0, 0, 0, 2, 1);
 		$this->RegisterProfile('Roborock.Volume', 'Speaker', '', " %", 0, 100, 1, 0, 1);
 		$this->RegisterProfile('Roborock.Battery', 'Battery', '', " %", 0, 100, 1, 0, 1);
+		$this->RegisterProfile('Roborock.Consumable', 'Gear', '', " %", 0, 100, 1, 0, 1);
 
 		// hidden, internal variables
 		$variable_notification_id = $this->RegisterVariableString('last_notification_state', 'last_notification_state', '', 99);
@@ -278,6 +280,19 @@ class Roborock extends IPSModule
 			$this->RegisterVariableString('consumables', $this->Translate('Consumables'), '~HTMLBox', $this->_getPosition());
 		} else {
 			$this->UnregisterVariable('consumables');
+		}
+
+		// consumables separate
+		if ($this->ReadPropertyBoolean('consumables_separate')) {
+			$this->RegisterVariableInteger('main_brush', $this->Translate('Main Brush'), 'Roborock.Consumable', $this->_getPosition());
+			$this->RegisterVariableInteger('side_brush', $this->Translate('Side Brush'), 'Roborock.Consumable', $this->_getPosition());
+			$this->RegisterVariableInteger('filter', $this->Translate('Filter'), 'Roborock.Consumable', $this->_getPosition());
+			$this->RegisterVariableInteger('sensor', $this->Translate('Sensor'), 'Roborock.Consumable', $this->_getPosition());
+		} else {
+			$this->UnregisterVariable('main_brush');
+			$this->UnregisterVariable('side_brush');
+			$this->UnregisterVariable('filter');
+			$this->UnregisterVariable('sensor');
 		}
 
 		// dnd mode
@@ -1933,6 +1948,11 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 						'caption' => 'Consumables'
 					],
 					[
+						'name' => 'consumables_separate',
+						'type' => 'CheckBox',
+						'caption' => 'Consumables (Separate Variables)'
+					],
+					[
 						'name' => 'dnd_mode',
 						'type' => 'CheckBox',
 						'caption' => 'DND Mode (Do not disturb)'
@@ -2801,7 +2821,19 @@ EOF;
 				]
 			]);
 
-			$this->SetRoborockValue('consumables', $html);
+
+			// consumables
+			if ($this->ReadPropertyBoolean('consumables')) {
+				$this->SetRoborockValue('consumables', $html);
+			}
+
+			// consumables separate
+			if ($this->ReadPropertyBoolean('consumables_separate')) {
+				$this->SetRoborockValue('main_brush', $main_brush_work_percent);
+				$this->SetRoborockValue('side_brush', $side_brush_work_percent);
+				$this->SetRoborockValue('filter', $filter_work_percent);
+				$this->SetRoborockValue('sensor', $sensor_dirty_percent);
+			}
 
 			// return values
 			return [
