@@ -589,7 +589,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 			}
 
 			// update consumables
-			if ($this->ReadPropertyBoolean('consumables')) {
+			if ($this->ReadPropertyBoolean('consumables') || $this->ReadPropertyBoolean('consumables_separate')) {
 				$this->Get_Consumables();
 			}
 
@@ -1224,6 +1224,22 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 			]
 		]);
 	}
+
+/*
+	public function ZoneCleanMulti(string $multizone, int $number)
+	{
+		return $this->RequestData('app_zoned_clean', [
+			'params' => [[
+				$lower_left_corner_x,
+				$lower_left_corner_y,
+				$upper_right_corner_x,
+				$upper_right_corner_y,
+				$number]
+			]
+		]);
+	}
+*/
+
 
 	/**
 	 * Roborock Vacuum 2 go to coordinates
