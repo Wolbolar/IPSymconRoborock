@@ -891,7 +891,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	 * @param int|array $record_id
 	 * @return array
 	 */
-	public function GetCleanRecord($record_id)
+	protected function GetCleanRecord($record_id)
 	{
 		return $this->RequestData('get_clean_record', [
 			'params' => is_array($record_id) ? $record_id : [(int)$record_id]
@@ -1576,6 +1576,11 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 		return true;
 	}
 
+	public function SendPushNotificationTest(int $state_id, int $error_id, bool $force_send)
+	{
+		$this->SendPushNotification($state_id, $error_id, $force_send);
+	}
+
 	/**
 	 * Send push notifications
 	 * @param string $state_id
@@ -1583,7 +1588,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	 * @param bool $force_send
 	 * @return bool
 	 */
-	public function SendPushNotification($state_id = 'errors', $error_id = 0, $force_send = false)
+	protected function SendPushNotification($state_id = 'errors', $error_id = 0, $force_send = false)
 	{
 		// get codes by state_id
 		if ($state_id == 'errors') {
@@ -2126,7 +2131,7 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 				[
 					'type' => 'Button',
 					'label' => 'Push Notification Test',
-					'onClick' => 'Roborock_SendPushNotification($id, 5, 0, true);'
+					'onClick' => 'Roborock_SendPushNotificationTest($id, 5, 0, true);'
 				],
 				/*
 					[
