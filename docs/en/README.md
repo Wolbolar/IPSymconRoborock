@@ -174,7 +174,7 @@ Then read the token
   ``` 
 
 
-### c. Konfiguration in IPS
+### c. Configuration in IPS
 
 In IP-Symcon, select Add_Instance_ (_CTRL + 1_) under the category under which you want to add the instance and select _Roborock_.
 

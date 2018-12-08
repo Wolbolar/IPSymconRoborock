@@ -502,6 +502,10 @@ class Roborock extends IPSModule
 		$this->CreateRoborockScript("Roborock Locate", "Roborock_Locate_Script", $this->CreateLocateScript());
 		$this->CreateRoborockScript("Roborock Charge", "Roborock_Charge_Script", $this->CreateChargeScript());
 		$this->CreateRoborockScript("Roborock Clean Spot", "Roborock_CleanSpot_Script", $this->CreateCleanSpotScript());
+		$this->CreateRoborockScript("Roborock Reset Mainbrush", "Roborock_ResetMainbrush_Script", $this->CreateResetMainbrushScript());
+		$this->CreateRoborockScript("Roborock Reset Filter", "Roborock_ResetFilter_Script", $this->CreateResetFilterScript());
+		$this->CreateRoborockScript("Roborock Reset Sensors", "Roborock_ResetSensors_Script", $this->CreateResetSensorsScript());
+		$this->CreateRoborockScript("Roborock Reset Sidebrush", "Roborock_ResetSidebrush_Script", $this->CreateResetSideBrushScript());
 	}
 
 	/**
@@ -570,6 +574,38 @@ Roborock_Charge(' . $this->InstanceID . ');
 	{
 		$Script = '<?
 Roborock_CleanSpot(' . $this->InstanceID . ');		
+?>';
+		return $Script;
+	}
+
+	private function CreateResetFilterScript()
+	{
+		$Script = '<?
+Roborock_Reset_Filter(' . $this->InstanceID . ');		
+?>';
+		return $Script;
+	}
+
+	private function CreateResetMainbrushScript()
+	{
+		$Script = '<?
+Roborock_Reset_Mainbrush(' . $this->InstanceID . ');		
+?>';
+		return $Script;
+	}
+
+	private function CreateResetSideBrushScript()
+	{
+		$Script = '<?
+Roborock_Reset_Sidebrush(' . $this->InstanceID . ');		
+?>';
+		return $Script;
+	}
+
+	private function CreateResetSensorsScript()
+	{
+		$Script = '<?
+Roborock_Reset_Sensors(' . $this->InstanceID . ');		
 ?>';
 		return $Script;
 	}
@@ -1705,9 +1741,12 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 	{
 		$token = $this->ReadPropertyString('token');
 		$token_mode = $this->ReadPropertyInteger('token_mode');
-		$setup_scripts = $this->ReadPropertyBoolean("setup_scripts");
 
 		$form = [
+			[
+				'type' => 'Image',
+				'image' => 'data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAHoAAAB4CAYAAAA9kebvAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoxZmUzOTk2NS0wMDg2LWNmNDUtOWYyZS0xMzk3NmM5NDBkN2QiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzMwQzZBODRGQTNGMTFFODg1RkFENjI2NjgwQjI1OEQiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzMwQzZBODNGQTNGMTFFODg1RkFENjI2NjgwQjI1OEQiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MWZlMzk5NjUtMDA4Ni1jZjQ1LTlmMmUtMTM5NzZjOTQwZDdkIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjFmZTM5OTY1LTAwODYtY2Y0NS05ZjJlLTEzOTc2Yzk0MGQ3ZCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pru80C0AACIhSURBVHja7F0JWJTl9j/frMwMwwwM+y6LiisuIAouKCq5d63UTFOvlqWVZjfr1u1v3ZZrdW9lWbfSFreumKmJmnu4K+IGiLKKLMM6C7Pv//MOYmqMQgzMQHOeZx4Q53uX8zvnd855v/f9Pgq6glAUMAR8mlGhNKfGD5sYZqCiaaWV7Fcfm72KWVbtpi8Xg1FcC2apHIBGa7zGYgGKxQRGcADQ/UUg6NUdtl88t/NAfu4ewaC+nLQzxzdLjXoJZTBSZq3O0ulV1FkHTqPTKa5QwPGjM4PG+odPmhTe41FmXolHsIEKEVB0D0OdBIx6vdUIrJ9bBvE7QcCBwGgxow3QgMF3B5qnAAoaJAXM2BjzyYaaw4fqK9PPVN44ZgQwahsUOhfQHSB0JpOeMihu3EOCgOnJFs4Udm4Rz8cIXFW9FCx0OhgRMBOZGJ3WPLAPErMZLCYzsLAtMBiBw+OBwZ1jUAZ5G6778LL+k3Pun9lqWZakDi3JBbT9xdvPx3tB3IhnEqvVE4aoqQRaZQ0o5Q0ATCaYKMtvlGxvIRRPPkYTuGFflNADKgI8qzKDBIe2VBZ8deJy1nEwml1At1U8vb2F86P6PTeP7bMkqLDST1MnBY0ZSZTBcMjoKbMF6Ag6z50HpsgQ82Fft32flue9ffZ67hnQG11At1b4QgH/mfgRL85uYDwTiAArpTIwMOiNlOwMQuK63gDubmyA6DDT0RCPAx/dzF2VefnSOacMec42IAaXQx8V0yflfc/u6+aWqeeYr5W4q0wGsDAZQNEo53IRNDw90rpBXEuLqZBFT/YKfowRGsAspkx5qoYGtcujbUhgSHDA632GfjCzXDNbk18CKkysKAYdOoNYEHCGwQQCkSdUDO1Ts6Ls0tzDuVcOOEtp5hxaRDbuFxQ+IL3fmJMDT+UlyCqrwMBEmqbRoLMIhRm+BcOKRqsFztVi3rywmCeYUWGcjPLiQ2AyuzwaUDmvj5/27sJi5YtUQSlb18kAtqlYnR44WJNfGzv40tMXjzxaiPKn9Wi+SMR7tVvse8vL9S9rb1YwDCym1TO6hGDIMWCyFlJS7Z8cHv3QObb5eI2yoYrU6X8qoCO7R0XuTplxOuVM4QS5TAZmTLa6nGDyqDWZwLOsRrRowNDFhvg+6jPZV079aYDuFh3VbVvf0QeCdmZENBj1VuvvqkIYykSy8+slkCoMHKvuH608V5B3ussDHdk9OpKAHLDvdKTSYsK6uOuCfFdWjoylKS6Fhzje43TxfVRnC66dAksXBTq6T++otP5jDgTsPhGpBHOXSLpaJQi2tlwME/zCxhkSB2pOZ18+2fWAxhzr095J3w0+dS1Brtf+aTy5WbALb8Jo76AxBylVerVMKu46QLOZ8OaQlA+nZ1fPa1ApO80iSHvSuKW4jEru2WfcEY5pt7ReIu2ApYr2l38+Mmf183W0FSqFoksnXq0Rsl7QLftGty/7jNgMZL28s3t0fL/YIW/L3T7V5BawLOjZLvktG9cZjRBYXh/sNWyQ4EhFyX4wmjon0DQOm/Ztz8QdAefzw7UMqusshtixzjaoNZDsFTj0osgts0hcUdApqfsfSanvxGaXDVaRMqo9QCarTA772Kk2YrNAlnkZPgju97UoOMir03n06MSklDcUnDW6G+UMSzuseln0OjQeWuPOkqZ9YR32oYHFaADAD8Vo+9zMdAp8axv4ymAf5enK0mPtVPS0g2BysTt11qG4gxfHNJiNdvdms1oJ3DHDQfTGc1b6s5t3tdg9aGCWKUD6/legOX4OKA6n7U3q0XD69dDNocQpJ7MyT3QKoMf27p+6Ue+7T3GjzFo32hdkBXCTkyAg7VOge3s6NMSa6qRQkTIXdDn5QCEFt4mhLBYQ0JlwZFTvXbP2/TDN3rc27R+jMbNe7Bm2wlwmbgeQ0ZNHI8jbPnM4yFYvxDFwU0eAxWSwSxbeoNXAyLKGqUP79B/m9MlYSlSv1ESxKkVlNtndk3kIcuC2tUAXCZ1o9cOOYYPcpi0ohaWBPV6xt5PYF2iuGyzxj15pKq+y68KIRacH96mpELDjC6B5CZwGY1NVLaj2HAWKbr/1AaVOB8lVmslJ/QeMsOdY7Wo2sX5BAxNqtKOUJiPZaW83jyFHZ7ijEkBz6gJYVO28547kdiotsKLDwS0h1jbIEhmIH38R9LkYn7lcu4Y+RkkFPJ4Y+dcTkHnMKYGe5BEwA4rKrBRkxyUk64/av/0Ly5n23jdNgRlUwOoWBYE7v7YdRiRyqHrkOVAfPQE0rrvdR6FSKiG+SjVW5Osjqq+prXeqrNsvKNAvo0dyHivjvKepky51WtRqYMUQkP8LzO7dmvfkeimIHyUgn2wXkK2gYLnIEfBhgbt80v6ivD1OFaOHh0SOEhSUeZo66U0LsxXkaAjc9aVtkLGcErejJ982OLI2IFfC0pjBL4K7fcKCfYCmUzCKJRhLkykaFzA6IchsAvLPCDLG5uY9GWPyo0tB/SsBmd/uYyI3PCIqpX35FJ3nNEDzhZ68ZLbnFJVK9cdOMDoUZIzJvYgnI11HhTX/nXo5evISBPlUh4Bs7ZNBA2G1zCc5okeq0wAd7ekdw8wr9rSwOtFOTqoxJrN7dYcgEpNteXJNPVROf/YWyO4dNjwLOgwd6TvZM2AcMGjOAfRgvvdgH6AzTJ3ouQBmLNNYCLI1JtsA2VBSDhXj54E6o2NBbqo2dFotJLgJh5OjwY4H2o0FSf4hE1Q1dc5z0vGBdK1ET74Vk23QtfFGBVROexq0l3I6HuTbxS8dzFeuuwvdOEKn8OhIHUSZLJ3DnS0YkzmDYhHkr4AZGWrbk6c8BboreY4DmSRkJiP09PINSYqKGe7wBRO6Beja3AJ6Z9jwZ70pkjQEAn78DOh+3s2DXFyGnrwYdNkIMo8H4ED7pegMMCJTak1ljqfuMYPjx/YJCO6uMxicH+ThCPJPn7cMZOLJjiYpLFVNChUkRfUY2dalrbZ7dL2cSTdxrEU+5cQgcwjIP64Fuo+XTbomMVmXfQ1BJqWrc4QiMopBfiEDHU7dRokcTDS+0566aPTkhMZ72L4i2548FUHOaQLZucpANdnA0Ua7azM6JqkczEp1+z0VyB4gW2OyDZCLbv4GMo/nhKZKWXXs8Bgt5HsIHHXm94Egj0hojMk2PFl/5TpUkuzaCrK7s7D1752pVupgoJFW5k6eusDsZKWVNSYTkElMtrHlSJeVCxWTFoLuakEjXd+ag0WrBYvRyR4jZTE73qPJI5icz5OHQiCJyTYSL11WDlQ+vBiMZWL0ZO4d12qAkzQYGP7eYNHpwHme5UM5Hmi6m5tTgcwbMxwTr09t0rUV5L88A8ZyMVAEZEvTtQpwnzwGgg9vBP8N/waa0MPq3dBFTpe0DWhU0q9ZmRnOcNSGAMWfPtG6rGkT5PM51jrZcBNB5nBv03UjyOPBf/N/rE8k5IyMh4CtaxrB1mgd79jOQN0Xc7IvUE4B8iT0xA+A4nJsg0zourwKYzLndp1s0RmA/5eJVpBp/N+ybu6YYVZmaATbsQ/0pfHdHQ80TeDeqFwHJWS/gfyhbZAzs2+DTPF++w5Juhj+IvD+8JW7QL4N9miM9Via0Tw9HBqz7bG92Q5A8zGh4YAjSqzbIG/8N4LsZsOTs633k40VVXfFZGuKgzRtrKqHuhX/ArNC1ez1nGTM3tM+c1zMRgdiBfq12cbaDDQ7wBeYngLrM647HORHJyPI6Mmc5g+Sa89cQk9+Bgwk8eJym2Udis0ExY49UDX7RZtgc0ffApvM0wExu4HHbvOKSZtvOTUYdA3j1fQ5HnqTu7mDrN0K8iMI8vcf2PRk9S/HoPKRJdYdIrQHHIKjmGzQ5eaCPqcQeJh5U81sV2Z2CwZOXD9Q7j4MFoXaLqcoW5LssplMWFWU9XKJQZPvUI+uktRXKUUeElpHe/J9Qc4A8axlYJY2oLe3rPyjcT0QxINQhddZlGqbNB7441qgeXVMzLaYjMD29wFORKgTLJgwGWCODtW152MZmqybgOzx6BQE+cP7erIVZKRhqpXPBiG3JpXpB29f3yzYo4ZAYNraRhpv55jNoGgg1mtURRpFkcOp2/reCYPJLRV4qVqDvn0mjrHVrFEC/7GpjZ5sIyar9/7aCBJ65B89xkoxWUjjeaDPJjSe3Gw7hMbd4vuDOv0ImBuUSPXtQ+MsnLc4zLfog8KLq9p6jNYujFvlxSvX8dysJwzaC2Th4rmNdbJNkJGuH1/e6MltPKtMtvQq0w9A1a32mk3Q0LPJrU+al7Dd6mwaqrM2UCS2x155uwB9JC/nF6kXv5Zm7xKrCeQl88D3i7dsAqginjz7lifb6VFOjWAfun/MJjS+HWlcRGjczjEbdekm8oKfS/O3gVbvHEArwKS6LmRns2h0O4OsQpDng++n/2fza6p9GVgaEc9Tt9mTm43Zew6BeOYLVopuFuyR8dYz2zSR0K4xm4HeLGZYZPvLC3faZS52GRVafIZOdoDp4W6fFbImT16KnrzmDZvKU+85ClUEhHYA+W6wG7Px+4P9GdAJjas1dnFs8volZb+oejnNInUeoFF2ll7fog72NVAGo51Ant8Iso34pPhfOiZe6MlKTbuBfBeN7z10/2yc3AjZ/lmjZ5NFlTbqgI+0vd8gT9PUS+2SANgvqLixYNuQiXsTzxU+pKIsbQP5OQKybbqWffwdVC9/zVpzUdBxR3TNoARe4hhMwtYCI8Cn2e9ojmdal1zJeS3Kegu39bqg9EZgxETAdEtZfFZOdqZdQoHdtIAJwwkP6mCyr/dDyqqq1j+9tykmL10Avp/8w+bXTNX1YKyqBa8Xl3TM6tS9YKNH67KygTFpdPOePTwOAn/83HrykpzA/CNsw2My4TDXvCPrfE6mvcZt16LX099PeCB6eJbP6ZwIQytrS0J3gqdnge/nb3aJm/3qQydB/MjSxmy8FUZvwdjsGRQAK6PYi745uG+dvcZj1+MVWqVKyxQJaWN1zFStXt/iB8lZMK4zAn1/d0+4MwszIhSMJRWgOXfBugjT4ghoskBh79DcV7JPPGdQa+y2ec3uS9Sbb1z9tsjf4ya7NSs5JpN1E58zPDvMnsII8SeTa5Ue3Hy9YZ2m6hN1nURj14TS3pOTS2Xy7xjKj7iegpbfo8ZYS7b3kD3WXUl0l68R327x99morrww0dW0guwNdq8c2mOCW8rz1xVH+hezWvi6XXJAz4yJS92K98BYXt35EcZQJPvkO1D9fPiBt0hvi9EI3NBA+Jre8KFW1mD3NdV2y3oWj5249O1CzafSisrGVwC3JFZrtcDw9wVW72jrg1XBYul8IOO4TZW11jNcFDnA3sITLG4GE5ROT84evX/LQL1UZuw0QJMJb0mYkJ5yuXyizGRoeWKGlm3RGzq1Q5PS0rp5oYVzpun0wB3czzJBmhN3Mf9aVrvkC+02W0zG3ijPWd43rMcAj4KbgfoWnp8mtbEj6mNHiQUTMIGPN6ymy/5xsSg/q938rj0nIZHLJNA93DJKxxhvUDnnQTwHwwwcLKdyh/fJeiX31FKtQqnrlEATOV9ddmbEhNTEHjfrIjUGveu9GncqX6MH/kOjYGF19vTCgoKidu2r3WeDFH5EUvlLQkT3sYEV9f5GusurrSEK4zIjPBhWsCTz9p05uae9++sQrddUimuXlF+aQY1O0DDscBO90xM2Jpv+3cLh+xiv97ccP/J9R/TZYe5VWFGe/zK9bjFv6AALXWf484KMNbaXpyccTO69f3VmxpsdFiY6cpLZhfmXb4b5FE3m+z1srqqjzH+yt9oRkD2FQsgY3Xf/E3u2TLP3MqfTAE0k9+aNK2XBopLJPqEPm8W18GcB26LXWz05Y3Sfg3MP/jhNI5FpO7J/h2g5V1x+ubJnSMnkoKhpcLOSMtGoLnMOudnEC2Oyd2AAHB3VZ/+TB358WC2RaTp6DA5zp5zSkssVvUKLE32DR3HLqjkGCrpk6UXH7NotJMB8YFzsroV7t85Q1UvUDjE2x5o6BV4eHl4/xKb8En+1Mq5eJoX2eOudQ6jabAauGYAV18/yrLJozo+5WZvB6LiH+jg8QGp0Os0hc8PPgUMGhvdWmXpRchUYO7t3E6rmC6AkvmfJqyzJU9tPH9/a4W/bcyqPvmckjw0aNmeFweOtqNK6cAl513QnezcHWbcmO0TYUWHmLQHs71Zfy3ytSiyucooQ4kyKyq0su3KAqd3Biwj1HCb0jTXXSMBIdlE6+esbyOsGGXojiLy94UZsRMEKqvapT88eXa1sUCidJldwNqXJGxrk+2vLduWFe+eEBQdHhessAZRK2wi4s9E5Akw3mkBANvnHhMm/jfBY+1JB5qILebnnne1eulO7CpPDZowPjp76LMf/9cH12lh9nRQ05FWIpPZ2IOjkMCHdaAR3Dw+oD/dX/uCm/e/6kpw15WJxmbPqslNkPCw2mzkusufk5/x7vD6oTjPAdKMcNBoNGAil0zuGlEj8ZSDAbBodLB7upvqoIPkOpvqbdQWXP0GAy52+lu9MyQ7TncsYHxs3IZlynzJSTU0Ilar9jFV1NDOWMhry4m6yYcGO8dxiMACLxrDuzuB4e0G9F7+hIEh4bW3BpX9l1Ffs1yiVGrOxc7xJpHPWMEjdHB7PLSkwfPS04KhZYRXSmL50Th9WjZRNqRsXnXQ6HeiRXq27Veg0a7lGkqY7UaHdon/rg3bQYwklczkc6yOpyVvamUH+kKdTFkgig6rSJeVpv9ZX/lJYXlqIDXc6lXX+pSjyQHiUPt0i+wUYIHTm4GFzlecuG7pzPXr3DwjppykXW0wyBZiVKuBxuRSHzW4EHD8yhcJiQSMgpyCZ3p6UmstWHsm7st99QB/WJa387K+lhQdvqhXFdShWTVk6r5q67AKzUCQS+giFPkaJ3Ewe5qrVqXTJ/ePHxMX0jjeYjAatTqfd/MueDRqDQcPg82h0Po8yspn60pIbNzvl7lOXuMQlLnGJS1ziEpe4xCUucYlLXOISl7jEJS5xiUtc4pKuIA65e0VDiY2NHejm5saVSCR1165du+qComUSHh4eERgYGGw0Gg2XL1++oNPpdE47WA8Pvlta2rbK9eu/tfz976/td8HXclm2bPnaDRs2WX744X/GkJCQ8JZex3AUkVRVVUFFRSWQe/ouabnI5XLIz88HPt8dzK14EL7DHj+A7A0MBgPoricgtM5FKAqYTCbqrXU+yriH/8O7d+8+euDAQdOqq6t191oMdeuczI4dP72AllXR9PeePXvGp6Y+9LxCoeBKpVITCrBYLPDx8WFhLCnatWvnR9ieja2wlCUsLCwI+5yFVDSyqqqabP7AidBBJBIx9Xp98fnzmVuKi4uzNZrmX16B1s2fNGnyouDgkOSKigqtSqWyKoTH44Gvry8Dr/9fSUnJifLy8gpbysN59xowYOC0kJDQobW1NVrLPbtMcDzMhoYG8U8/bV+KejHd+htt6NChkxMTk56srKw04fytW5Q4HA4EBAS4lZbeyMjJydmNHnjdFgAhIcGhERGRIwYPjnsE2a3ZJwRgfzRvb5Hhq6++mk1i84NA5aLMmTP3fQ7HLYhGo7MNBsMVK9CYFNGGDx8xc+LEiWuUSpWIxPfg4FAc9O+AbrQOBvN18tMdZe7cJ78JCgp6WK83MPh8AU4w0Oqp2LgVLPL7888vW3jlyuV/b936v7tO+COIxLjiX3555dW6unoPYlikDdIv6Yt+ayvvkCEJy8+cOf3xhg3fL793UuPGjZuekjL2Y6PRFKzVagGVZmUJs7lxXxhhjgkTJk3D5krT03cvOXPmzB7jHS8CR2Pijxs3/vkRI0a+VVNTQyNGimDD74FmgERSf7MpgSU+MXv2ExvQmIZotTr8d7fbTEXaID/79x8wCft+f+PGDXMyMn7dfO/YFy5c9H99+/Zd0dCg4JMxcbm83/VLhPxfz549jJjbLDI/gK8RS8bixc9s8vHxfVitVkPfvn1gy5bNm6xAL1my9P3u3XusuH79OnqBO/EQHfanxp/UvR5NBoJK05MG589fsBMbHCOVysDb29tMo1EKtGZ9aenNgqioyL4ymQwBN/Exs+bHxg5YRYwNwV5puWM2yAyeEokUB8i2MBj0hoAAPwvxRGJs9fX1Fvzpjt7MxPEtmzFjJmzblra8aa4I8gxU5Cb0JgabzQY2200jEHiYMP4X4k8P/Ld3fX0dDT3NXafTh82f/9d0VOzrX3zxxTvkeuyHvWrVmz+jkY4icc/T05MoSo1spOPxuNSdSkeDZTMYtAbs24gMFDVv3vz9RqM5XC5vINcZ8BoNOls9/lsaFBTYHcGjoeFxc3NzqfHjx28wmYzUiRMnNjUZw8KFC1f36BHz8s2bZZicehDdKoRCoZHL5VD3gk08Gp1Uj85zX5BRBywEeauXl2gayX369+9nQCObuXv37p8YAwcOHI4UO5+AjB2a8bvHdu7c8Ram7mewcXYzNGJGS1G+9trre00m8xiVSg0Iquzo0SNvHDx4cCNOwozgGDCOMPB64dSp015Can++pOQGJCQk4MRunszKOv9zE0OQSSExGCWS2u/Xr1+/DBVNx2spAiZSpRpZZvHQoYnvIHjucXFxy8TiyjPHjh3b2q1bt7Dp0x/9Kj+/gOHr602Sun3btm19TSwWX8c2KQSG7Pe2YNt+S5c+t1mt1gy5evUqekbMC8HBwd8jjZePHDlyhsFgHIV0TwxVq1A0/ITU/A62cQPHwbqXzVDRJsIySIvrce7haJgIsk8+MsXKrKysg6RP9D4TcQhkucgZM2b8E9lhCnZFmzFj1kbUh+LAgQO7UlJSHh40KO5lLCvBz88P8vKurtm//5cPMTRJ0WAYNuibGL6KRWKiDZDnzZtnBRnDJ/Tr10+flpY2E8e2w2qos2fPWYOU5YVgw4UL59/Ytm3bO00XY6xr9mQ+KjmCyWQlyeV1+Hu4Ki1t61+OHDly9N7voScr1q797IUFCxaUxcT0/qC2to4M4KmLFy/83DR4VDAUFha8v27d16/d6vOuNrZv374GmaHw4Yen70EjgaSk4SsJ0BjTHsMJeSATACoyDa+fhYr6ncXjtcpXXlmZgB64Fof9LHqaD+YTT3/zzbp/JCYOX0ayf6Ls7du3/eXcuXP7mq5DFmj2wHpUVPRgZL0RMpkc478w//PPP0spKioqayY7vvLee+9NXbnylY2ensIniIeFhoam4n/tQudaROYiEAjg7Nkzf8Oc58O2rH0Q8HF+24KCgqegcxAdGxCTx/bsSd9119oFUThSRvWpUye/aklP6FmpaL08ElM2bdr4dHMg3ymbN2/+UC6XnSb9YMKU2AM5C+OzjmSP5eVlmRh7X7/f9YcPH9574sSxNeT7mLANQEX1wraCSKnh7+8Px45lfNgcyHfKiRPH16DVa0legO1EMhsflh5O2pRKJRkXLlzY15K5jxgx/DFyHAhDA+zfv29VcyA3CckZ3nvv3bnoSJmk3549e03CJE2gUCj9SBxHBq06dOjQ2j+agSNhmUjaNH/+/DQCslKpJImxHpntLpCtQCNNWdP1goL8k2JxVW1LOiANkoFjckBiaeWDvk/i7cWLFw8iHZKMUIgGyEd6NZNYhTFdim09cCM1KqYar0U6V5Bk0APj83jydwwDp65cufLAd0+gpdcIhQIdSdKI1RNFk2SFzB1Zr/7OBO3+iz2CQELfOCfV2bPnDj3o+2RumP1KSVKKxq6PjIzsQVYFMRuG48ePbcFw0ernmZAQTnIFdE7OvHkLtgYFhUwlRo+ZOWHlD9LT03/3rixaU12Ggz7Z0gK8sY6jW8HGhEbQkmswVnoQZZIJkzBD2sA4h7GPxmW04CGvmExZwSFJl1arUaKXnySGggwRjl7i96DrSd8EWEwYrcnQnVVEa/brc249fxsNlYGG7vHA+pU8xJaiuLfGTqnVKi0mrxoyBlKZ/DGxEF1YZs16fBPmAI8hQ5BkFkho9PX1X4yJb5JdFkyQkmpJEkXqRox3L9nID24LZqmh8fFD5hNlY2y6hN59DuN0BlE61pFJo0aNSr3f9UjPXjExMdMIk6DiNBh3q2pra3NIv0h/gZgzJDxozL169U7GhExAwCV0f3dm23KkT548seeWsbMnTpz0/IOpfkQqGmMScQoER47sc+X69WtHSZ/Dhg37azCpY1spxMmQldxwCnHEWDAZliJlX+Pz+STHET3xxJy9yBpJbQYaa9F9GKPqSCeo7ESsg9fbAhuV6o3l2w5MzATEG2Qy6XHiWZjp/kriXFlZOcyaNXsTxv1BzV2PSaI7JmJve3p6xRHqv3TpwkY0ljp3d56YlEPV1dUwadKU77BsSrDlUViHj8TPm8QwhUJPyMzM3PpHl39LSkpOkXBDSscePXo+P3PmLJtgD0J5/PHZm0jiFRgYCMXFRTsxKSf5UBFhJqVSJcCKYAfRUWvHQZyG6BypP+Pdd98evGzZC3EikddpLy+rTvhI6enx8fGJbVrrxnig3Lt3z6tJSSO+FourATtYgPVoPBrAtwgAib0UxjAMepTfkCFDFiJV+RGj8PLyqj1y5PCaxuToxFZU/rMsFnsIlkiiJ5+cf2zAgIGbMDu9jIogqzlGbMd7xIiRi9B7A7C0IDFIionfx+R6TGK2jxqVfByteDgakXD27CeO5OXlbcHvXcBYzL4Vl/X9+8dORkWORYOikeQxLy93fUbGr7sQLI8/MveysrJSLIe+xDLtFfwdkCY/xmx6Sm5uzg7MrlkkKUav0olE3v0x+32ioKCQS0CVSuvPY2n1OWlj7969a154YflMpFwf/Ax86aW/5Vy4kLUOQ2c1vfm1TVIumjZt2vSJddmxMdOGmprqX7///juShCnI3958c9WEv//9tXQ+35hYWVkpmD9/wR7U4STE5QS1cuWrFuIpCNyKzMxz/2nNpJFyF0yZMm09KR0INREPI5Mi9EjiPSmViBeRBQEej1vz5Zf/faigoOBC0/VCodD7mWee3cvne8TV10uIpVu/S+IXoVbi+WRBAq+1JkzfffftRLz+7B2rWp4rVryUjhn0MGIIhNIIfZH432T1pKYkYyGLMMggV7Hcm4ZtFGDOIFi27MUSVKAn5jU/vfXWW9Nbs9785JPzPhowYMCyigqxlfrJ3Em/5P8IFiThI1k3Gjf+Ls/84ovPJ8hJPXpLMBQNXLToqX0ItC/5Lim1SLJ5Z0hpyiVIexEREcalS5/1SkkZ+2Z0dPflqGfzF1+sjSktLc2/c2xYrgrRcMgi0HDSbmRkhByrmkl0rEtXEXrDuR+orKw43Rqgb9y4cVEsrjzki0JWi9CLKRJHm7JaAhyCqczPv74O67oFxcXFeffEejV6wjYESBEeHh6DE+WT60kGSQyHWC0CLMME/TTWmgtyc3PP3nk9ljnaS5cu/cjnu5MVOQ+BQOiPY6CR/omREICJArGtq2JxxderV6+ejkYpueURbgkJQ5ehMjnYfl5GRkZaa+aOYzmAfeR06xbeDevwIGLUZOzEsBuXcvkYNuiVmZln//XTT9ufR6qX3Hk9jkN8/fr17Tg+Znh4RAyOgUXaIPMmH1KpED006ROd0Xz06JHVkZFRyV5eoqGYyZtPnTr1Ef6f7M52cUxaLBW3DR06dBgadziJ5ePHj5/8/wIMAMbqV2AoW9w5AAAAAElFTkSuQmCC'
+			],
 			[
 				'name' => 'token_mode',
 				'type' => 'Select',
@@ -1814,227 +1853,251 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 						'caption' => 'Seconds'
 					],
 					[
-						'type' => 'Label',
-						'label' => 'Push Notifications'
-					],
-					[
-						'name' => 'notification_instance',
-						'type' => 'SelectInstance',
-						'caption' => 'Webfront Configurator'
-					],
-					[
-						'type' => 'List',
-						'name' => 'notifications',
+						'type' => 'ExpansionPanel',
 						'caption' => 'Push Notifications',
-						'rowCount' => count($this->push_notifications),
-						'add' => false,
-						'delete' => false,
-						'sort' => [
-							'column' => 'name',
-							'direction' => 'ascending'
-						],
-						'columns' => [
+						'items' => [
 							[
-								'name' => 'enabled',
-								'label' => 'Enabled',
-								'width' => '50px',
-								'edit' => [
-									'type' => 'CheckBox',
-									'caption' => 'Enable Push Notification'
-								]
+								'type' => 'Label',
+								'label' => 'Push Notifications'
 							],
 							[
-								'name' => 'name',
-								'label' => 'Notification',
-								'width' => 'auto',
-								'save' => true
+								'name' => 'notification_instance',
+								'type' => 'SelectInstance',
+								'caption' => 'Webfront Configurator'
 							],
 							[
-								'name' => 'sound',
-								'label' => 'Notification Sound',
-								'width' => '120px',
-								'edit' => [
-									'type' => 'Select',
-									'options' => [
-										[
-											'label' => 'default',
-											'value' => ''
-										],
-										[
-											'label' => 'alarm',
-											'value' => 'alarm'
-										],
-										[
-											'label' => 'bell',
-											'value' => 'bell'
-										],
-										[
-											'label' => 'boom',
-											'value' => 'boom'
-										],
-										[
-											'label' => 'buzzer',
-											'value' => 'buzzer'
-										],
-										[
-											'label' => 'connected',
-											'value' => 'connected'
-										],
-										[
-											'label' => 'dark',
-											'value' => 'dark'
-										],
-										[
-											'label' => 'digital',
-											'value' => 'digital'
-										],
-										[
-											'label' => 'drums',
-											'value' => 'drums'
-										],
-										[
-											'label' => 'duck',
-											'value' => 'duck'
-										],
-										[
-											'label' => 'full',
-											'value' => 'full'
-										],
-										[
-											'label' => 'happy',
-											'value' => 'happy'
-										],
-										[
-											'label' => 'horn',
-											'value' => 'horn'
-										],
-										[
-											'label' => 'inception',
-											'value' => 'inception'
-										],
-										[
-											'label' => 'kazoo',
-											'value' => 'kazoo'
-										],
-										[
-											'label' => 'roll',
-											'value' => 'roll'
-										],
-										[
-											'label' => 'siren',
-											'value' => 'siren'
-										],
-										[
-											'label' => 'space',
-											'value' => 'space'
-										],
-										[
-											'label' => 'trickling',
-											'value' => 'trickling'
-										],
-										[
-											'label' => 'turn',
-											'value' => 'turn'
+								'type' => 'List',
+								'name' => 'notifications',
+								'caption' => 'Push Notifications',
+								'rowCount' => count($this->push_notifications),
+								'add' => false,
+								'delete' => false,
+								'sort' => [
+									'column' => 'name',
+									'direction' => 'ascending'
+								],
+								'columns' => [
+									[
+										'name' => 'enabled',
+										'label' => 'Enabled',
+										'width' => '100px',
+										'edit' => [
+											'type' => 'CheckBox',
+											'caption' => 'Enable Push Notification'
 										]
+									],
+									[
+										'name' => 'name',
+										'label' => 'Notification',
+										'width' => 'auto',
+										'save' => true
+									],
+									[
+										'name' => 'sound',
+										'label' => 'Notification Sound',
+										'width' => '170px',
+										'edit' => [
+											'type' => 'Select',
+											'options' => [
+												[
+													'label' => 'default',
+													'value' => ''
+												],
+												[
+													'label' => 'alarm',
+													'value' => 'alarm'
+												],
+												[
+													'label' => 'bell',
+													'value' => 'bell'
+												],
+												[
+													'label' => 'boom',
+													'value' => 'boom'
+												],
+												[
+													'label' => 'buzzer',
+													'value' => 'buzzer'
+												],
+												[
+													'label' => 'connected',
+													'value' => 'connected'
+												],
+												[
+													'label' => 'dark',
+													'value' => 'dark'
+												],
+												[
+													'label' => 'digital',
+													'value' => 'digital'
+												],
+												[
+													'label' => 'drums',
+													'value' => 'drums'
+												],
+												[
+													'label' => 'duck',
+													'value' => 'duck'
+												],
+												[
+													'label' => 'full',
+													'value' => 'full'
+												],
+												[
+													'label' => 'happy',
+													'value' => 'happy'
+												],
+												[
+													'label' => 'horn',
+													'value' => 'horn'
+												],
+												[
+													'label' => 'inception',
+													'value' => 'inception'
+												],
+												[
+													'label' => 'kazoo',
+													'value' => 'kazoo'
+												],
+												[
+													'label' => 'roll',
+													'value' => 'roll'
+												],
+												[
+													'label' => 'siren',
+													'value' => 'siren'
+												],
+												[
+													'label' => 'space',
+													'value' => 'space'
+												],
+												[
+													'label' => 'trickling',
+													'value' => 'trickling'
+												],
+												[
+													'label' => 'turn',
+													'value' => 'turn'
+												]
+											]
+										]
+									],
+									[
+										'name' => 'state_id',
+										'label' => 'State ID',
+										'width' => 'auto',
+										'save' => true,
+										'visible' => false
 									]
 								]
-							],
-							[
-								'name' => 'state_id',
-								'label' => 'State ID',
-								'width' => 'auto',
-								'save' => true,
-								'visible' => false
 							]
 						]
 					],
 					[
-						'type' => 'Label',
-						'label' => 'Enabled options'
+						'type' => 'ExpansionPanel',
+						'caption' => 'Enabled options',
+						'items' => [
+							[
+								'type' => 'Label',
+								'label' => 'Enabled options'
+							],
+							[
+								'name' => 'fan_power',
+								'type' => 'CheckBox',
+								'caption' => 'Fan Power'
+							],
+							[
+								'name' => 'error_code',
+								'type' => 'CheckBox',
+								'caption' => 'Error Code'
+							],
+							[
+								'name' => 'consumables',
+								'type' => 'CheckBox',
+								'caption' => 'Consumables'
+							],
+							[
+								'name' => 'consumables_separate',
+								'type' => 'CheckBox',
+								'caption' => 'Consumables (Separate Variables)'
+							],
+							[
+								'name' => 'dnd_mode',
+								'type' => 'CheckBox',
+								'caption' => 'DND Mode (Do not disturb)'
+							],
+							[
+								'name' => 'clean_area',
+								'type' => 'CheckBox',
+								'caption' => 'Clean Area'
+							],
+							[
+								'name' => 'clean_time',
+								'type' => 'CheckBox',
+								'caption' => 'Clean Time'
+							],
+							[
+								'name' => 'total_cleans',
+								'type' => 'CheckBox',
+								'caption' => 'Total Cleans'
+							],
+							[
+								'name' => 'serial_number',
+								'type' => 'CheckBox',
+								'caption' => 'Serial Number'
+							],
+							[
+								'name' => 'timer_details',
+								'type' => 'CheckBox',
+								'caption' => 'Timer Details'
+							],
+							[
+								'name' => 'findme',
+								'type' => 'CheckBox',
+								'caption' => 'find robot'
+							],
+							[
+								'name' => 'volume',
+								'type' => 'CheckBox',
+								'caption' => 'Volume'
+							],
+							[
+								'name' => 'timezone',
+								'type' => 'CheckBox',
+								'caption' => 'Timezone'
+							],
+							[
+								'name' => 'remote',
+								'type' => 'CheckBox',
+								'caption' => 'Remote Control'
+							]
+						]
 					],
 					[
-						'name' => 'fan_power',
-						'type' => 'CheckBox',
-						'caption' => 'Fan Power'
-					],
-					[
-						'name' => 'error_code',
-						'type' => 'CheckBox',
-						'caption' => 'Error Code'
-					],
-					[
-						'name' => 'consumables',
-						'type' => 'CheckBox',
-						'caption' => 'Consumables'
-					],
-					[
-						'name' => 'consumables_separate',
-						'type' => 'CheckBox',
-						'caption' => 'Consumables (Separate Variables)'
-					],
-					[
-						'name' => 'dnd_mode',
-						'type' => 'CheckBox',
-						'caption' => 'DND Mode (Do not disturb)'
-					],
-					[
-						'name' => 'clean_area',
-						'type' => 'CheckBox',
-						'caption' => 'Clean Area'
-					],
-					[
-						'name' => 'clean_time',
-						'type' => 'CheckBox',
-						'caption' => 'Clean Time'
-					],
-					[
-						'name' => 'total_cleans',
-						'type' => 'CheckBox',
-						'caption' => 'Total Cleans'
-					],
-					[
-						'name' => 'serial_number',
-						'type' => 'CheckBox',
-						'caption' => 'Serial Number'
-					],
-					[
-						'name' => 'timer_details',
-						'type' => 'CheckBox',
-						'caption' => 'Timer Details'
-					],
-					[
-						'name' => 'findme',
-						'type' => 'CheckBox',
-						'caption' => 'find robot'
-					],
-					[
-						'name' => 'volume',
-						'type' => 'CheckBox',
-						'caption' => 'Volume'
-					],
-					[
-						'name' => 'timezone',
-						'type' => 'CheckBox',
-						'caption' => 'Timezone'
-					],
-					[
-						'name' => 'remote',
-						'type' => 'CheckBox',
-						'caption' => 'Remote Control'
-					],
-					[
-						'type' => 'Label',
-						'label' => 'Install scripts'
-					],
-					[
-						'name' => 'setup_scripts',
-						'type' => 'CheckBox',
-						'caption' => 'Setup scripts'
+						'type' => 'ExpansionPanel',
+						'caption' => 'Install scripts',
+						'items' => $this->SelectionSkripts()
 					]
 				]
 			);
 		}
+		return $form;
+	}
 
+	protected function SelectionSkripts()
+	{
+		$setup_scripts = $this->ReadPropertyBoolean("setup_scripts");
+		$form = [
+			[
+				'type' => 'Label',
+				'label' => 'Install scripts'
+			],
+			[
+				'name' => 'setup_scripts',
+				'type' => 'CheckBox',
+				'caption' => 'Setup scripts'
+			]
+		];
 		if ($setup_scripts) {
 			$form = array_merge_recursive(
 				$form,
@@ -2047,8 +2110,6 @@ Roborock_CleanSpot(' . $this->InstanceID . ');
 				]
 			);
 		}
-
-
 		return $form;
 	}
 
