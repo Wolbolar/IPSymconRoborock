@@ -61,10 +61,10 @@ class RoborockIO extends IPSModule
         $this->SetBuffer('queue', '[]');
 
         // register timer
-        $this->RegisterTimer('RoborockQueue', 200, 'RoborockIO_HandleQueue(' . $this->InstanceID . ');');
+        $this->RegisterTimer('RoborockQueue', 0, 'RoborockIO_HandleQueue(' . $this->InstanceID . ');');
 
-        // register Webhook
-        $this->RegisterWebhook('/hook/Roborock');
+		//we will wait until the kernel is ready
+		$this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     /**
@@ -75,9 +75,39 @@ class RoborockIO extends IPSModule
     {
         parent::ApplyChanges();
 
+		if (IPS_GetKernelRunlevel() !== KR_READY) {
+			return;
+		}
+
+		// register Webhook
+		$this->RegisterWebhook('/hook/Roborock');
+
+		$this->SetTimerInterval("RoborockQueue", 200);
+
         // set status to 102, due no configuration
         $this->SetStatus(102);
     }
+
+	public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+	{
+
+		switch ($Message) {
+			case IM_CHANGESTATUS:
+				if ($Data[0] === IS_ACTIVE) {
+					$this->ApplyChanges();
+				}
+				break;
+
+			case IPS_KERNELMESSAGE:
+				if ($Data[0] === KR_READY) {
+					$this->ApplyChanges();
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
 
     /**
      * receive from children
