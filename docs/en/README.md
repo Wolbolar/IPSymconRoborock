@@ -1,4 +1,6 @@
 # Roborock vacuum cleaner robot
+[![Version](https://img.shields.io/badge/Symcon-PHPModule-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Version](https://img.shields.io/badge/Symcon%20Version-%3E%205.1-green.svg)](https://www.symcon.de/en/service/documentation/installation/)
 
 Module for IP Symcon version 4.3 or higher
 
@@ -57,15 +59,42 @@ With the module it is possible to control a [Roborock](https://www.roborock.com/
 
 ### a. Loading the module
 
-Open the IP Symcon (min Ver 4.3) console. In the object tree, under Core instances, open the instance __ * Modules * __ with a double mouse click.
+Open the IP Console's web console with _http://<IP-Symcon IP>:3777/console/_.
 
-![Modules](img/Modules.png?raw=true "Modules")
+Then click on the module store icon in the upper right corner.
 
-In the _Modules_ instance, press the button __*Add*__ in the top right corner.
+![Store](img/store_icon.png?raw=true "open store")
 
-![ModulesAdd](img/Hinzufuegen.png?raw=true "Hinzufügen")
+In the search field type
+
+```
+Roborock
+```  
+
+
+![Store](img/module_store_search_en.png?raw=true "module search")
+
+Then select the module and click _Install_
+
+![Store](img/install_en.png?raw=true "install")
+
+
+#### Install alternative via Modules instance
+
+_Open_ the object tree.
+
+![Objektbaum](img/object_tree.png?raw=true "object tree")	
+
+Open the instance _'Modules'_ below core instances in the object tree of IP-Symcon (>= Ver 5.x) with a double-click and press the _Plus_ button.
+
+![Modules](img/modules.png?raw=true "modules")	
+
+![Plus](img/plus.png?raw=true "Plus")	
+
+![ModulURL](img/add_module.png?raw=true "Add Module")
  
-Add the following URL in the window that opens:
+Enter the following URL in the field and confirm with _OK_:
+
 
 ```	
 https://github.com/Wolbolar/IPSymconRoborock  
@@ -74,6 +103,18 @@ https://github.com/Wolbolar/IPSymconRoborock
 and confirm with _OK_.    
     
 Then an entry for the module appears in the list of the instance _Modules_
+
+By default, the branch _master_ is loaded, which contains current changes and adjustments.
+Only the _master_ branch is kept current.
+
+![Master](img/master.png?raw=true "master") 
+
+If an older version of IP-Symcon smaller than version 5.1 (min 4.3) is used, click on the gear on the right side of the list.
+It opens another window,
+
+![SelectBranch](img/select_branch_en.png?raw=true "select branch") 
+
+here you can switch to another branch, for older versions smaller than 5.1 (min 4.3) select _Old-Version_ .
 
 ### b. Obtain the IP address and the token  
 
@@ -178,7 +219,7 @@ Then read the token
 
 In IP-Symcon, select Add_Instance_ (_CTRL + 1_) under the category under which you want to add the instance and select _Roborock_.
 
-![AddInstance](img/Roborock_add_instance.png?raw=true "Add Instance")
+![AddInstance](img/Roborock_add_instance_en.png?raw=true "Add Instance")
 
 The configuration form opens. Please specify here:
   - Check the IP address of the vacuum cleaner in the app or the router
