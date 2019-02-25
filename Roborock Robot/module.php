@@ -1271,7 +1271,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 	{
 		$multizone = json_decode($multizone, true);
 		return $this->RequestData('app_zoned_clean', [
-			'params' => [ $multizone ]
+			'params' => $multizone
 		]);
 	}
 
