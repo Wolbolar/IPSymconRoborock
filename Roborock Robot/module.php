@@ -1256,19 +1256,20 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 				$lower_left_corner_y,
 				$upper_right_corner_x,
 				$upper_right_corner_y,
-				$number]
-			]
+				$number
+			]]
 		]);
 	}
 
 
 	/** Roborock Vacuum 2 clean multiple zone with coordinates for area, use a rectangle with values for the lower left corner and the upper right corner
-	 * $multizone = '['.$lower_left_corner_x.','. $lower_left_corner_y.','. $upper_right_corner_x.','. $upper_right_corner_y.','. $number.'],['. $lower_left_corner_x1.','. $lower_left_corner_y1.','.	$upper_right_corner_x1.','. $upper_right_corner_y1.','. $number.']';
+	 * $multizone = '[['.$lower_left_corner_x.','. $lower_left_corner_y.','. $upper_right_corner_x.','. $upper_right_corner_y.','. $number.'],['. $lower_left_corner_x1.','. $lower_left_corner_y1.','.	$upper_right_corner_x1.','. $upper_right_corner_y1.','. $number.']]';
 	 * @param string $multizone
 	 * @return array|bool
 	 */
 	public function ZoneCleanMulti(string $multizone)
 	{
+		$multizone = json_decode($multizone, true);
 		return $this->RequestData('app_zoned_clean', [
 			'params' => [ $multizone ]
 		]);

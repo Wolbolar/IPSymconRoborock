@@ -527,6 +527,44 @@ _**Reinigt in der Zone der angebenen Koordinaten**_
  Parameter _$upper_right_corner_y_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
  Parameter _$number_ __Anzahl der Reinigungen__ 
  
+ _**Reinigt meherere Zonen mit den angebenen Koordinaten**_
+ 
+  ```php
+  Roborock_ZoneCleanMulti(integer $InstanceID, string $multizone);
+  ```   
+          
+  Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz 
+  
+  Parameter _$multizone_ __JSON String__ mit mehreren Zonen
+  
+  Beispiel:
+  
+  Zone 1:
+  
+  Parameter _$lower_left_corner_x_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+  Parameter _$upper_right_corner_x_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$upper_right_corner_y_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$number_ __Anzahl der Reinigungen__ 
+  
+  Zone 2:
+  
+  Parameter _$lower_left_corner_x1_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$lower_left_corner_y1_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+  Parameter _$upper_right_corner_x1_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$upper_right_corner_y1_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  Parameter _$number1_ __Anzahl der Reinigungen__ 
+ 
+   ```php
+   $InstanceID = 12345;
+   $multizone = [
+   [$lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y, $number],
+   [$lower_left_corner_x1, $lower_left_corner_y1, $upper_right_corner_x1, $upper_right_corner_y1, $number1]
+   ];
+   $multizone = json_encode($multizone);
+   Roborock_ZoneCleanMulti($InstanceID, $multizone);
+   ```   
+  
 _**Fährt zu den angegebenen Koordinaten**_
           
  ```php
