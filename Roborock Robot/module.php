@@ -1777,13 +1777,14 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		if (!$this->CheckConfiguration()) {
 			$this->SetStatus(201);
 		}
-
-		// return current form
-		return json_encode([
+		$form = json_encode([
 			'elements' => $this->FormHead(),
 			'actions' => $this->FormActions(),
 			'status' => $this->FormStatus()
 		]);
+		$this->_debug("Form", $form);
+		// return current form
+		return $form;
 	}
 
 	/**
@@ -2139,7 +2140,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 								'type' => 'List',
 								'name' => 'zonecoordinates',
 								'caption' => 'zone coordinates',
-								'rowCount' => $this->GetNumberZones(),
+								'rowCount' => $this->GetNumberZones()  + 2,
 								'add' => true,
 								'delete' => true,
 								'sort' => [
@@ -2167,7 +2168,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 									[
 										'name' => 'lx',
 										'label' => 'lower left corner x',
-										'width' => '100px',
+										'width' => '150px',
 										'add' => 25000,
 										'save' => true,
 										'edit' => [
@@ -2177,7 +2178,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 									[
 										'name' => 'ly',
 										'label' => 'lower left corner y',
-										'width' => '100px',
+										'width' => '150px',
 										'add' => 25000,
 										'save' => true,
 										'edit' => [
@@ -2187,7 +2188,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 									[
 										'name' => 'ux',
 										'label' => 'upper right corner x',
-										'width' => '100px',
+										'width' => '150px',
 										'add' => 25000,
 										'save' => true,
 										'edit' => [
@@ -2197,7 +2198,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 									[
 										'name' => 'uy',
 										'label' => 'upper right corner y',
-										'width' => '100px',
+										'width' => '150px',
 										'add' => 25000,
 										'save' => true,
 										'edit' => [
@@ -2218,18 +2219,29 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 	{
 		$zones = $this->GetZones();
 		$number = count($zones);
+		$this->_debug("Zone numbers", $number);
 		return $number;
 	}
 
 	protected function GetZoneID()
 	{
 		$zoneid = $this->GetNumberZones() + 1;
+		$this->_debug("Zones ID", $zoneid);
 		return $zoneid;
 	}
 
 	public function GetZones()
 	{
-		$zones = json_decode($this->ReadPropertyString("zonecoordinates"), true);
+		$zones_json = $this->ReadPropertyString("zonecoordinates");
+		$this->_debug("Zones", $zones_json);
+		if($zones_json == "")
+		{
+			$zones = [];
+		}
+		else
+		{
+			$zones = json_decode($zones_json, true);
+		}
 		return $zones;
 	}
 
