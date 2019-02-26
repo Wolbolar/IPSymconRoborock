@@ -1297,7 +1297,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		$zones = $this->GetZones();
 		$zoneid = $roomnumber -1;
 		$zonenumber = $this->GetNumberZones() -1;
-		if($zonenumber < $number)
+		if($zonenumber < $roomnumber)
 		{
 			$zone = $zones[$zoneid];
 			$this->_debug("ZoneClean", "room: ". $zone["roomname"]);
@@ -2260,6 +2260,60 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 			$zones = json_decode($zones_json, true);
 		}
 		return $zones;
+	}
+
+	public function GetZoneCoordinatesByNumber(int $roomnumber)
+	{
+		$zones = $this->GetZones();
+		$zoneid = $roomnumber -1;
+		$zonenumber = $this->GetNumberZones() -1;
+		if($zonenumber < $roomnumber)
+		{
+			$zone = $zones[$zoneid];
+			$this->_debug("Zone Coordinates", "room: ". $zone["roomname"]);
+			$lower_left_corner_x = $zone["lx"];
+			$lower_left_corner_y = $zone["ly"];
+			$upper_right_corner_x = $zone["ux"];
+			$upper_right_corner_y = $zone["uy"];
+			$this->_debug("Zone Coordinates", "left x: ".$lower_left_corner_x.", left y: ".$lower_left_corner_y.", right x: ".$upper_right_corner_x.", right y: ".$upper_right_corner_y);
+			$result = [$lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y];
+		}
+		else
+		{
+			$this->_debug("Zone Coordinates", "could not find roomnumber");
+			$result = false;
+		}
+		return $result;
+	}
+
+	public function GetZoneCoordinatesByName(string $roomname)
+	{
+		$zones = $this->GetZones();
+		$zoneid = -1;
+		foreach($zones as $key => $zone)
+		{
+			if($zone["roomname"] == $roomname)
+			{
+				$zoneid = $key;
+			}
+		}
+		if($zoneid > -1)
+		{
+			$zone = $zones[$zoneid];
+			$this->_debug("Zone Coordinates", "room: ". $zone["roomname"]);
+			$lower_left_corner_x = $zone["lx"];
+			$lower_left_corner_y = $zone["ly"];
+			$upper_right_corner_x = $zone["ux"];
+			$upper_right_corner_y = $zone["uy"];
+			$this->_debug("Zone Coordinates", "left x: ".$lower_left_corner_x.", left y: ".$lower_left_corner_y.", right x: ".$upper_right_corner_x.", right y: ".$upper_right_corner_y);
+			$result = [$lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y];
+		}
+		else
+		{
+			$this->_debug("Zone Coordinates", "could not find roomname");
+			$result = false;
+		}
+		return $result;
 	}
 
 	protected function SelectionSkripts()
