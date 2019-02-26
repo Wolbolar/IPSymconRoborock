@@ -152,7 +152,21 @@
       "weekends": "Wochenenden",
       "every day": "jeden Tag",
       "custom": "Benutzerdefiniert",
-      "Current Coordinates": "Aktuelle Koordinaten"
+      "Current Coordinates": "Aktuelle Koordinaten",
+      "Zones": "Zonen",
+      "room name": "Raumname",
+      "zone coordinates": "Zonen Koordinaten",
+      "zone": "Zone",
+      "per zone define the coordinates for the room name": "Pro Zone sind Koordinaten für den Raumnamen zu hinterlegen",
+      "X coordinate of the lower left corner of the cleaning zone": "X-Koordinate der linken unteren Ecke der Reinigungszone",
+      "Y coordinate of the lower left corner of the cleaning zone": "Y-Koordinate der linken unteren Ecke der Reinigungszone",
+      "X coordinate of the upper right corner of the cleaning zone": "X-Koordinate der oberen rechten Ecke der Reinigungszone",
+      "Y coordinate of the upper right corner of the cleaning zone": "Y-Koordinate der oberen rechten Ecke der Reinigungszone",
+      "number of cleanings": "Anzahl der Reinigungsvorgänge",
+      "lower left corner x": " linke untere Ecke X",
+      "lower left corner y": " linke untere Ecke Y",
+      "upper right corner x": "obere rechte Ecke X",
+      "upper right corner y": "obere rechte Ecke Y"
     }
   }
 }
