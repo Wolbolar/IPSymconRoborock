@@ -1276,6 +1276,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		if($zoneid > -1)
 		{
 			$zone = $zones[$zoneid];
+			$this->_debug("ZoneClean", "room: ". $zone["roomname"]);
 			$lower_left_corner_x = $zone["lx"];
 			$lower_left_corner_y = $zone["ly"];
 			$upper_right_corner_x = $zone["ux"];
@@ -1298,11 +1299,6 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		$zonenumber = $this->GetNumberZones() -1;
 		if($zonenumber < $number)
 		{
-			$this->_debug("ZoneClean", "could not find roomnumber");
-			$result = false;
-		}
-		else
-		{
 			$zone = $zones[$zoneid];
 			$this->_debug("ZoneClean", "room: ". $zone["roomname"]);
 			$lower_left_corner_x = $zone["lx"];
@@ -1311,6 +1307,11 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 			$upper_right_corner_y = $zone["uy"];
 			$this->_debug("ZoneClean", "left x: ".$lower_left_corner_x.", left y: ".$lower_left_corner_y.", right x: ".$upper_right_corner_x.", right y: ".$upper_right_corner_y);
 			$result = $this->ZoneClean($lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y, $number);
+		}
+		else
+		{
+			$this->_debug("ZoneClean", "could not find roomnumber");
+			$result = false;
 		}
 		return $result;
 	}
@@ -1328,7 +1329,22 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		]);
 	}
 
-
+	/** Roborock Vacuum 2 clean multiple zone with coordinates for area, use a rectangle with values for the lower left corner and the upper right corner
+	 * @param string $multizone
+	 * @return array|bool
+	 */
+	public function ZoneCleanMultiName(string $multizone)
+	{
+		$multizone = json_decode($multizone, true);
+		$command_zones = [];
+		foreach($multizone as $key => $zone)
+		{
+			$command_zones[] = [$zone[0][0], $zone[0][1], $zone[0][2], $zone[0][3], $zone[1]];
+		}
+		return $this->RequestData('app_zoned_clean', [
+			'params' => $command_zones
+		]);
+	}
 
 	/**
 	 * Roborock Vacuum 2 go to coordinates
