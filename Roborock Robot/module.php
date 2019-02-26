@@ -127,6 +127,7 @@ class Roborock extends IPSModule
 
 		$this->RegisterPropertyInteger('notification_instance', 0);
 		$this->RegisterPropertyString('notifications', $this->GetPushNotifications());
+		$this->RegisterPropertyString('zonecoordinates', "");
 		$this->RegisterPropertyBoolean('setup_scripts', false);
 		$this->RegisterPropertyInteger('script_category', 0);
 
@@ -1261,6 +1262,57 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		]);
 	}
 
+	public function ZoneCleanRoomname(string $roomname, int $number)
+	{
+		$zones = $this->GetZones();
+		$zoneid = -1;
+		foreach($zones as $key => $zone)
+		{
+			if($zone["roomname"] == $roomname)
+			{
+				$zoneid = $key;
+			}
+		}
+		if($zoneid > -1)
+		{
+			$zone = $zones[$zoneid];
+			$lower_left_corner_x = $zone["lx"];
+			$lower_left_corner_y = $zone["ly"];
+			$upper_right_corner_x = $zone["ux"];
+			$upper_right_corner_y = $zone["uy"];
+			$this->_debug("ZoneClean", "left x: ".$lower_left_corner_x.", left y: ".$lower_left_corner_y.", right x: ".$upper_right_corner_x.", right y: ".$upper_right_corner_y);
+			$result = $this->ZoneClean($lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y, $number);
+		}
+		else
+		{
+			$this->_debug("ZoneClean", "could not find roomname");
+			$result = false;
+		}
+		return $result;
+	}
+
+	public function ZoneCleanRoomnumber(int $roomnumber, int $number)
+	{
+		$zones = $this->GetZones();
+		$zoneid = $roomnumber -1;
+		$zonenumber = $this->GetNumberZones() -1;
+		if($zonenumber < $number)
+		{
+			$this->_debug("ZoneClean", "could not find roomnumber");
+			$result = false;
+		}
+		else
+		{
+			$zone = $zones[$zoneid];
+			$lower_left_corner_x = $zone["lx"];
+			$lower_left_corner_y = $zone["ly"];
+			$upper_right_corner_x = $zone["ux"];
+			$upper_right_corner_y = $zone["uy"];
+			$this->_debug("ZoneClean", "left x: ".$lower_left_corner_x.", left y: ".$lower_left_corner_y.", right x: ".$upper_right_corner_x.", right y: ".$upper_right_corner_y);
+			$result = $this->ZoneClean($lower_left_corner_x, $lower_left_corner_y, $upper_right_corner_x, $upper_right_corner_y, $number);
+		}
+		return $result;
+	}
 
 	/** Roborock Vacuum 2 clean multiple zone with coordinates for area, use a rectangle with values for the lower left corner and the upper right corner
 	 * $multizone = '[['.$lower_left_corner_x.','. $lower_left_corner_y.','. $upper_right_corner_x.','. $upper_right_corner_y.','. $number.'],['. $lower_left_corner_x1.','. $lower_left_corner_y1.','.	$upper_right_corner_x1.','. $upper_right_corner_y1.','. $number.']]';
@@ -2078,11 +2130,107 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 						'type' => 'ExpansionPanel',
 						'caption' => 'Install scripts',
 						'items' => $this->SelectionSkripts()
-					]
+					],
+					[
+						'type' => 'ExpansionPanel',
+						'caption' => 'Zones',
+						'items' => [
+							[
+								'type' => 'List',
+								'name' => 'zonecoordinates',
+								'caption' => 'zone coordinates',
+								'rowCount' => $this->GetNumberZones(),
+								'add' => true,
+								'delete' => true,
+								'sort' => [
+									'column' => 'zone',
+									'direction' => 'ascending'
+								],
+								'columns' => [
+									[
+										'name' => 'zone',
+										'label' => 'zone',
+										'width' => '100px',
+										'add ' => $this->GetZoneID(),
+										'save' => true
+									],
+									[
+										'name' => 'roomname',
+										'label' => 'room name',
+										'width' => 'auto',
+										'add' => 'room name',
+										'save' => true,
+										'edit' => [
+											'type' => 'ValidationTextBox'
+										]
+									],
+									[
+										'name' => 'lx',
+										'label' => 'lower left corner x',
+										'width' => '100px',
+										'add' => 25000,
+										'save' => true,
+										'edit' => [
+											'type' => 'NumberSpinner'
+										]
+									],
+									[
+										'name' => 'ly',
+										'label' => 'lower left corner y',
+										'width' => '100px',
+										'add' => 25000,
+										'save' => true,
+										'edit' => [
+											'type' => 'NumberSpinner'
+										]
+									],
+									[
+										'name' => 'ux',
+										'label' => 'upper right corner x',
+										'width' => '100px',
+										'add' => 25000,
+										'save' => true,
+										'edit' => [
+											'type' => 'NumberSpinner'
+										]
+									],
+									[
+										'name' => 'uy',
+										'label' => 'upper right corner y',
+										'width' => '100px',
+										'add' => 25000,
+										'save' => true,
+										'edit' => [
+											'type' => 'NumberSpinner'
+										]
+									]
+								]
+							]
+						]
+					],
 				]
 			);
 		}
 		return $form;
+	}
+
+	protected function GetNumberZones()
+	{
+		$zones = $this->GetZones();
+		$number = count($zones);
+		return $number;
+	}
+
+	protected function GetZoneID()
+	{
+		$zoneid = $this->GetNumberZones() + 1;
+		return $zoneid;
+	}
+
+	public function GetZones()
+	{
+		$zones = json_decode($this->ReadPropertyString("zonecoordinates"), true);
+		return $zones;
 	}
 
 	protected function SelectionSkripts()
