@@ -1304,6 +1304,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 		else
 		{
 			$zone = $zones[$zoneid];
+			$this->_debug("ZoneClean", "room: ". $zone["roomname"]);
 			$lower_left_corner_x = $zone["lx"];
 			$lower_left_corner_y = $zone["ly"];
 			$upper_right_corner_x = $zone["ux"];
@@ -2152,7 +2153,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
 										'name' => 'zone',
 										'label' => 'zone',
 										'width' => '100px',
-										'add ' => $this->GetZoneID(),
+										'add' => $this->GetZoneID(),
 										'save' => true
 									],
 									[
