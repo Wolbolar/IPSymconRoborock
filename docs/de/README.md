@@ -522,9 +522,13 @@ _**Reinigt in der Zone der angebenen Koordinaten**_
  Parameter _$InstanceID_ __*ObjektID*__ der Roborock Instanz 
  
  Parameter _$lower_left_corner_x_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
- Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+ 
+ Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+   
  Parameter _$upper_right_corner_x_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+ 
  Parameter _$upper_right_corner_y_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+ 
  Parameter _$number_ __Anzahl der Reinigungen__ 
  
  _**Reinigt meherere Zonen mit den angebenen Koordinaten**_
@@ -539,20 +543,28 @@ _**Reinigt in der Zone der angebenen Koordinaten**_
   
   Beispiel:
   
-  Zone 1:
+  _Zone 1:_
   
   Parameter _$lower_left_corner_x_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
-  Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+  
+  Parameter _$lower_left_corner_y_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+    
   Parameter _$upper_right_corner_x_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  
   Parameter _$upper_right_corner_y_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  
   Parameter _$number_ __Anzahl der Reinigungen__ 
   
-  Zone 2:
+  _Zone 2:_
   
   Parameter _$lower_left_corner_x1_ __X-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
-  Parameter _$lower_left_corner_y1_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)  
+  
+  Parameter _$lower_left_corner_y1_ __Y-Koordinate der linken unteren Ecke__ der Reinigungszone (Rechteck)
+    
   Parameter _$upper_right_corner_x1_ __X-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  
   Parameter _$upper_right_corner_y1_ __Y-Koordinate der oberen rechten Ecke__ der Reinigungszone (Rechteck)
+  
   Parameter _$number1_ __Anzahl der Reinigungen__ 
  
    ```php
