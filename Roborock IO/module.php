@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 // set base dir
 define('__ROOT__', dirname(dirname(__FILE__)));
 
 // load ips constants
-require_once(__ROOT__ . '/libs/ips.constants.php');
+require_once __ROOT__ . '/libs/ips.constants.php';
 
 /**
  * Class RoborockIO
- * Xiaomi Mi Vacuum Cleaner I/O Device
+ * Xiaomi Mi Vacuum Cleaner I/O Device.
  */
 class RoborockIO extends IPSModule
 {
@@ -39,7 +41,7 @@ class RoborockIO extends IPSModule
     private $iv = '';
 
     /**
-     * close socket on destruction
+     * close socket on destruction.
      */
     public function __destruct()
     {
@@ -49,7 +51,8 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * create instance
+     * create instance.
+     *
      * @return bool|void
      */
     public function Create()
@@ -63,55 +66,58 @@ class RoborockIO extends IPSModule
         // register timer
         $this->RegisterTimer('RoborockQueue', 0, 'RoborockIO_HandleQueue(' . $this->InstanceID . ');');
 
-		//we will wait until the kernel is ready
-		$this->RegisterMessage(0, IPS_KERNELMESSAGE);
+        //we will wait until the kernel is ready
+        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     /**
-     * apply changes from configuration form
+     * apply changes from configuration form.
+     *
      * @return bool|void
      */
     public function ApplyChanges()
     {
         parent::ApplyChanges();
 
-		if (IPS_GetKernelRunlevel() !== KR_READY) {
-			return;
-		}
+        if (IPS_GetKernelRunlevel() !== KR_READY) {
+            return;
+        }
 
-		// register Webhook
-		$this->RegisterWebhook('/hook/Roborock');
+        // register Webhook
+        $this->RegisterWebhook('/hook/Roborock');
 
-		$this->SetTimerInterval("RoborockQueue", 200);
+        $this->SetTimerInterval('RoborockQueue', 200);
 
         // set status to 102, due no configuration
         $this->SetStatus(102);
     }
 
-	public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
-	{
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
 
-		switch ($Message) {
-			case IM_CHANGESTATUS:
-				if ($Data[0] === IS_ACTIVE) {
-					$this->ApplyChanges();
-				}
-				break;
+        switch ($Message) {
+            case IM_CHANGESTATUS:
+                if ($Data[0] === IS_ACTIVE) {
+                    $this->ApplyChanges();
+                }
+                break;
 
-			case IPS_KERNELMESSAGE:
-				if ($Data[0] === KR_READY) {
-					$this->ApplyChanges();
-				}
-				break;
+            case IPS_KERNELMESSAGE:
+                if ($Data[0] === KR_READY) {
+                    $this->ApplyChanges();
+                }
+                break;
 
-			default:
-				break;
-		}
-	}
+            default:
+                break;
+        }
+    }
 
     /**
-     * receive from children
+     * receive from children.
+     *
      * @param string $JSONString
+     *
      * @return string json data
      */
     public function ForwardData($JSONString)
@@ -144,7 +150,8 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Queue Handler
+     * Queue Handler.
+     *
      * @return void
      */
     public function HandleQueue()
@@ -157,7 +164,7 @@ class RoborockIO extends IPSModule
             $this->SetBuffer('queue', '[]');
 
             // loop queue
-            foreach ($queue AS $item) {
+            foreach ($queue as $item) {
                 // short timeout
                 IPS_Sleep(100);
 
@@ -177,17 +184,19 @@ class RoborockIO extends IPSModule
 
                 // send to children
                 $this->SendDataToChildren(json_encode([
-                    'DataID' => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
-                    'InstanceID' => (int)$item->InstanceID,
-                    'Buffer' => $buffer
+                    'DataID'     => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
+                    'InstanceID' => (int) $item->InstanceID,
+                    'Buffer'     => $buffer
                 ]));
             }
         }
     }
 
     /**
-     * send command & receive response
+     * send command & receive response.
+     *
      * @param $payload
+     *
      * @return string json data
      */
     protected function Send($payload)
@@ -198,7 +207,7 @@ class RoborockIO extends IPSModule
         $this->token = $this->_validateToken($payload->token);
         $this->ip = $payload->ip;
         $message = [
-            'id' => null,
+            'id'     => null,
             'method' => $payload->method,
             'params' => $payload->params
         ];
@@ -250,7 +259,7 @@ class RoborockIO extends IPSModule
                         $this->attempts = 0;
                         return $result;
                     } // on invalid response, retry attempt
-                    else if ($this->attempts < 3) {
+                    elseif ($this->attempts < 3) {
                         return $this->Retry($payload);
                     } // return false
                     else {
@@ -269,10 +278,12 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Send commands and forward response to children
-     * @param int $instance_id
+     * Send commands and forward response to children.
+     *
+     * @param int          $instance_id
      * @param array|string $data
-     * @param bool $doTimeout
+     * @param bool         $doTimeout
+     *
      * @return bool
      */
     protected function SendData(int $instance_id, $data, $doTimeout = true)
@@ -290,14 +301,14 @@ class RoborockIO extends IPSModule
 
         // build payload
         $payload = [
-            'token' => $token,
-            'ip' => $ip,
-            'method' => $data['method'],
-            'params' => isset($data['params']) ? $data['params'] : [],
+            'token'     => $token,
+            'ip'        => $ip,
+            'method'    => $data['method'],
+            'params'    => isset($data['params']) ? $data['params'] : [],
             'immediate' => true
         ];
 
-        $payload = (object)$payload;
+        $payload = (object) $payload;
 
         // send command to robot
         $buffer = $this->Send($payload);
@@ -310,16 +321,16 @@ class RoborockIO extends IPSModule
 
         // send buffer to children
         $this->SendDataToChildren(json_encode([
-            'DataID' => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
-            'InstanceID' => (int)$instance_id,
-            'Buffer' => $buffer
+            'DataID'     => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
+            'InstanceID' => (int) $instance_id,
+            'Buffer'     => $buffer
         ]));
 
         // sleep on specific commands
         if ($doTimeout) {
             if ($payload->method == 'app_rc_start') {
                 IPS_Sleep(5000);
-            } else if ($payload->method == 'app_rc_move') {
+            } elseif ($payload->method == 'app_rc_move') {
                 IPS_Sleep(500);
             }
         }
@@ -328,8 +339,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Retry Message Send
+     * Retry Message Send.
+     *
      * @param array $payload
+     *
      * @return string
      */
     private function Retry($payload = [])
@@ -341,8 +354,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * send HELLO message initially
+     * send HELLO message initially.
+     *
      * @param string $discover_ip
+     *
      * @return array|bool
      */
     protected function SendHello($discover_ip = null)
@@ -399,8 +414,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Discover device and get token
+     * Discover device and get token.
+     *
      * @param string $ip
+     *
      * @return array|bool
      */
     protected function Discover(string $ip)
@@ -415,7 +432,7 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * creates an udp socket
+     * creates an udp socket.
      */
     protected function SocketCreate()
     {
@@ -423,7 +440,7 @@ class RoborockIO extends IPSModule
         if ($this->socket) {
             $this->_debug('socket [instance]', 'already created');
         } /** create socket */
-        else if ($this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+        elseif ($this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
             $this->_debug('socket [instance]', 'created');
         } /** error handling */
         else {
@@ -432,12 +449,13 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * sends a receive timeout to socket
+     * sends a receive timeout to socket.
+     *
      * @param int $timeout
      */
     protected function SocketSetTimeout($timeout = 2)
     {
-        if (socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => $timeout, 'usec' => 0))) {
+        if (socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0])) {
             $this->_debug('socket [settings]', 'set timeout to ' . $timeout . 's');
         } else {
             $this->SocketErrorHandler();
@@ -445,7 +463,7 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * handles socket error messages
+     * handles socket error messages.
      */
     protected function SocketErrorHandler()
     {
@@ -461,11 +479,13 @@ class RoborockIO extends IPSModule
      ***********************************************************/
 
     /**
-     * validate token length
+     * validate token length.
+     *
      * @param string $token
+     *
      * @return bool|null
      */
-    private function _validateToken($token = NULL)
+    private function _validateToken($token = null)
     {
         // validate token length
         if (strlen($token) === 32) {
@@ -483,8 +503,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * validate json response
+     * validate json response.
+     *
      * @param string $json
+     *
      * @return array|bool|mixed|string
      */
     private function _validateResponse(string $json)
@@ -511,7 +533,7 @@ class RoborockIO extends IPSModule
             $result = [
                 'error' => $result
             ];
-        } else if (empty($result)) {
+        } elseif (empty($result)) {
             $this->_debug('data [error]', 'no json received');
             $result = [
                 'error' => 'no json data received!'
@@ -522,7 +544,8 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * generate almost unique message id
+     * generate almost unique message id.
+     *
      * @return int
      */
     private function _getMessageId()
@@ -531,14 +554,16 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * increment message id
+     * increment message id.
+     *
      * @param int $delta
+     *
      * @return int
      */
     private function _increaseMessageId($delta = 1)
     {
         // read last message id
-        $message_id = (int)$this->GetBuffer('message_id');
+        $message_id = (int) $this->GetBuffer('message_id');
 
         // increment by $delta
         $message_id = ($message_id + $delta);
@@ -556,8 +581,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * build socket message
+     * build socket message.
+     *
      * @param $command
+     *
      * @return string
      */
     private function _buildMessage($command)
@@ -567,7 +594,7 @@ class RoborockIO extends IPSModule
         }
 
         $data = $this->_encrypt($command);
-        $this->length = sprintf('%04x', (int)strlen($data) / 2 + 32);
+        $this->length = sprintf('%04x', (int) strlen($data) / 2 + 32);
         $this->timestamp = sprintf('%08x', time() + $this->time_diff);
         $packet = $this->magic . $this->length . $this->unknown1 . $this->devicetype . $this->serial . $this->timestamp . $this->token . $data;
         $this->checksum = md5(hex2bin($packet));
@@ -577,8 +604,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * parse socket message
+     * parse socket message.
+     *
      * @param $message
+     *
      * @return array
      */
     private function _parseMessage($message)
@@ -623,8 +652,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * encrypt data
+     * encrypt data.
+     *
      * @param $data
+     *
      * @return string
      */
     protected function _encrypt($data)
@@ -633,8 +664,10 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * decrypt data
+     * decrypt data.
+     *
      * @param $data
+     *
      * @return string
      */
     protected function _decrypt($data)
@@ -643,18 +676,20 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * send debug log
+     * send debug log.
+     *
      * @param string $notification
      * @param string $message
-     * @param int $format 0 = Text, 1 = Hex
+     * @param int    $format       0 = Text, 1 = Hex
      */
-    private function _debug(string $notification = NULL, string $message = NULL, $format = 0)
+    private function _debug(string $notification = null, string $message = null, $format = 0)
     {
         $this->SendDebug($notification, $message, $format);
     }
 
     /**
-     * retrieve last json error message
+     * retrieve last json error message.
+     *
      * @return mixed|string
      */
     protected function _jsonLastErrorMsg()
@@ -663,12 +698,12 @@ class RoborockIO extends IPSModule
             function json_last_error_msg()
             {
 
-                static $ERRORS = array(JSON_ERROR_NONE => 'No error has occurred',
-                    JSON_ERROR_DEPTH => 'The maximum stack depth has been exceeded',
-                    JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
-                    JSON_ERROR_CTRL_CHAR => 'Control character error, possibly incorrectly encoded',
-                    JSON_ERROR_SYNTAX => 'Syntax error',
-                    JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded');
+                static $ERRORS = [JSON_ERROR_NONE => 'No error has occurred',
+                    JSON_ERROR_DEPTH              => 'The maximum stack depth has been exceeded',
+                    JSON_ERROR_STATE_MISMATCH     => 'Invalid or malformed JSON',
+                    JSON_ERROR_CTRL_CHAR          => 'Control character error, possibly incorrectly encoded',
+                    JSON_ERROR_SYNTAX             => 'Syntax error',
+                    JSON_ERROR_UTF8               => 'Malformed UTF-8 characters, possibly incorrectly encoded'];
 
                 $error = json_last_error();
                 return isset($ERRORS[$error]) ? $ERRORS[$error] : 'Unknown error';
@@ -679,7 +714,7 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Process Webhook Data
+     * Process Webhook Data.
      */
     protected function ProcessHookData()
     {
@@ -690,15 +725,15 @@ class RoborockIO extends IPSModule
         // check instance id
         if (!$instance_id) {
             die('Instance ID Missing ($_GET[\'id\'])');
-        } else if (!@IPS_GetObject($instance_id)) {
+        } elseif (!@IPS_GetObject($instance_id)) {
             die('Instance ID ' . $instance_id . ' does not exist!');
         }
 
         // handle commands
         switch ($cmd):
             case 'remote':
-                $rotation = (float)(isset($_GET['rotation']) ? $_GET['rotation'] : 0);
-                $speed = (float)(isset($_GET['speed']) ? $_GET['speed'] : 0.1);
+                $rotation = (float) (isset($_GET['rotation']) ? $_GET['rotation'] : 0);
+                $speed = (float) (isset($_GET['speed']) ? $_GET['speed'] : 0.1);
                 $start = isset($_GET['start']) ? true : false;
                 $end = isset($_GET['end']) ? true : false;
 
@@ -707,12 +742,12 @@ class RoborockIO extends IPSModule
                         $instance_id,
                         'app_rc_start'
                     );
-                } else if ($end) {
+                } elseif ($end) {
                     $this->SendData(
                         $instance_id,
                         'app_rc_end'
                     );
-                } else if ($rotation) {
+                } elseif ($rotation) {
                     $this->SendData(
                         $instance_id,
                         'app_rc_start',
@@ -725,9 +760,9 @@ class RoborockIO extends IPSModule
                             'method' => 'app_rc_move',
                             'params' => [
                                 [
-                                    'omega' => $rotation,
+                                    'omega'    => $rotation,
                                     'velocity' => $speed,
-                                    'seqnum' => 1,
+                                    'seqnum'   => 1,
                                     'duration' => 1000
                                 ]
                             ]
@@ -739,7 +774,7 @@ class RoborockIO extends IPSModule
             default:
                 if (!isset($_FILES['image']['tmp_name']) || !file_exists($_FILES['image']['tmp_name']) || $_FILES['image']['name'] != 'latest.png') {
                     die('Image missing!');
-                } else if (!isset($_FILES['coordinates']['tmp_name']) || !file_exists($_FILES['coordinates']['tmp_name'])) {
+                } elseif (!isset($_FILES['coordinates']['tmp_name']) || !file_exists($_FILES['coordinates']['tmp_name'])) {
                     die('Coordinates missing!');
                 } else {
                     // validate uploaded image
@@ -760,7 +795,7 @@ class RoborockIO extends IPSModule
                         $y = 0;
                         $img_x = 0;
                         $img_y = 0;
-                        foreach (file($_FILES['coordinates']['tmp_name']) AS $line) {
+                        foreach (file($_FILES['coordinates']['tmp_name']) as $line) {
                             if (strstr($line, 'estimate')) {
                                 $d = explode('estimate', $line);
                                 $d = trim($d[1]);
@@ -818,13 +853,13 @@ class RoborockIO extends IPSModule
                         // send coordinates to children
                         if ($x && $y) {
                             $this->SendDataToChildren(json_encode([
-                                'DataID' => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
-                                'InstanceID' => (int)$instance_id,
-                                'Buffer' => [
-                                    'token' => false,
+                                'DataID'     => '{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}',
+                                'InstanceID' => (int) $instance_id,
+                                'Buffer'     => [
+                                    'token'  => false,
                                     'method' => 'coordinates',
-                                    'x' => $x,
-                                    'y' => $y
+                                    'x'      => $x,
+                                    'y'      => $y
                                 ]
                             ]));
                         }
@@ -839,18 +874,19 @@ class RoborockIO extends IPSModule
     }
 
     /**
-     * Register Webhook
+     * Register Webhook.
+     *
      * @param string $webhook
-     * @param bool $delete
+     * @param bool   $delete
      */
     protected function RegisterWebhook($webhook, $delete = false)
     {
-        $ids = IPS_GetInstanceListByModuleID("{015A6EB8-D6E5-4B93-B496-0D3F77AE9FE1}");
+        $ids = IPS_GetInstanceListByModuleID('{015A6EB8-D6E5-4B93-B496-0D3F77AE9FE1}');
 
-        if (sizeof($ids) > 0) {
-            $hooks = json_decode(IPS_GetProperty($ids[0], "Hooks"), true);
+        if (count($ids) > 0) {
+            $hooks = json_decode(IPS_GetProperty($ids[0], 'Hooks'), true);
             $found = false;
-            foreach ($hooks AS $index => $hook) {
+            foreach ($hooks as $index => $hook) {
                 if ($hook['Hook'] == $webhook) {
                     if ($hook['TargetID'] == $this->InstanceID && !$delete)
                         return;
@@ -863,10 +899,10 @@ class RoborockIO extends IPSModule
                 }
             }
             if (!$found) {
-                $hooks[] = ["Hook" => $webhook, "TargetID" => $this->InstanceID];
+                $hooks[] = ['Hook' => $webhook, 'TargetID' => $this->InstanceID];
             }
 
-            IPS_SetProperty($ids[0], "Hooks", json_encode($hooks));
+            IPS_SetProperty($ids[0], 'Hooks', json_encode($hooks));
             IPS_ApplyChanges($ids[0]);
         }
     }
@@ -876,15 +912,16 @@ class RoborockIO extends IPSModule
      ***********************************************************/
 
     /**
-     * Polyfill for IP-Symcon 4.4 and older
+     * Polyfill for IP-Symcon 4.4 and older.
+     *
      * @param string $Ident
-     * @param mixed $Value
+     * @param mixed  $Value
      */
     protected function SetValue($Ident, $Value)
     {
         if (IPS_GetKernelVersion() >= 5) {
             parent::SetValue($Ident, $Value);
-        } else if ($id = @$this->GetIDForIdent($Ident)) {
+        } elseif ($id = @$this->GetIDForIdent($Ident)) {
             SetValue($id, $Value);
         }
     }
