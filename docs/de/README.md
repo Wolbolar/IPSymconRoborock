@@ -1,6 +1,8 @@
 # Roborock Staubsauger Roboter
 [![Version](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Version](https://img.shields.io/badge/Symcon%20Version-%3E%205.1-green.svg)](https://www.symcon.de/service/dokumentation/installation/)
+![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
+[![StyleCI](https://github.styleci.io/repos/123504524/shield?branch=master)](https://github.styleci.io/repos/123504524)
 
 Modul für IP-Symcon ab Version 4.3
 
