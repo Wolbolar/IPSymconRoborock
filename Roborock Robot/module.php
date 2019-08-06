@@ -1472,11 +1472,11 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     protected function Change_Timer(string $command, $timerid)
     {
         if ($command == 'on') {
-            $this->EnableTimer($timerid);
+            $this->EnableTimer(strval($timerid));
         } elseif ($command == 'off') {
-            $this->DisableTimer($timerid);
+            $this->DisableTimer(strval($timerid));
         } elseif ($command == 'delete') {
-            $this->DeleteTimer($timerid);
+            $this->DeleteTimer(strval($timerid));
         }
     }
 
@@ -2335,14 +2335,14 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     {
         $zones = $this->GetZones();
         $number = count($zones);
-        $this->_debug('Zone numbers', $number);
+        $this->_debug('Zone numbers', strval($number));
         return $number;
     }
 
     protected function GetZoneID()
     {
         $zoneid = $this->GetNumberZones() + 1;
-        $this->_debug('Zones ID', $zoneid);
+        $this->_debug('Zones ID', strval($zoneid));
         return $zoneid;
     }
 
@@ -3618,7 +3618,7 @@ EOF;
     protected function change_sound_volume_callback(array $data)
     {
         // start & stop device quickly, to check volume
-        if (in_array(GetValueInteger('state'), [2, 3, 8, 10, 15, 100])) {
+        if (in_array(GetValueInteger((int) 'state'), [2, 3, 8, 10, 15, 100])) {
             $this->Start();
             $this->Stop();
         }

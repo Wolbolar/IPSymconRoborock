@@ -574,7 +574,7 @@ class RoborockIO extends IPSModule
         }
 
         // save to buffer
-        $this->SetBuffer('message_id', $message_id);
+        $this->SetBuffer('message_id', strval($message_id));
 
         // return message id
         return $message_id;
@@ -725,7 +725,7 @@ class RoborockIO extends IPSModule
         // check instance id
         if (!$instance_id) {
             die('Instance ID Missing ($_GET[\'id\'])');
-        } elseif (!@IPS_GetObject($instance_id)) {
+        } elseif (!@IPS_GetObject(intval($instance_id))) {
             die('Instance ID ' . $instance_id . ' does not exist!');
         }
 
@@ -739,23 +739,23 @@ class RoborockIO extends IPSModule
 
                 if ($start) {
                     $this->SendData(
-                        $instance_id,
+                        intval($instance_id),
                         'app_rc_start'
                     );
                 } elseif ($end) {
                     $this->SendData(
-                        $instance_id,
+                        intval($instance_id),
                         'app_rc_end'
                     );
                 } elseif ($rotation) {
                     $this->SendData(
-                        $instance_id,
+                        intval($instance_id),
                         'app_rc_start',
                         false
                     );
 
                     $this->SendData(
-                        $instance_id,
+                        intval($instance_id),
                         [
                             'method' => 'app_rc_move',
                             'params' => [
@@ -844,7 +844,7 @@ class RoborockIO extends IPSModule
                         }
 
                         // move to instance
-                        IPS_SetParent($media_id, $instance_id);
+                        IPS_SetParent($media_id, intval($instance_id));
 
                         // update media content
                         IPS_SetMediaFile($media_id, $media_file, false);
