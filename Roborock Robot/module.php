@@ -1,6 +1,6 @@
 <?php
 
-// declare(strict_types=1);
+declare(strict_types=1);
 // set base dir
 define('__ROOT__', dirname(dirname(__FILE__)));
 
@@ -3618,7 +3618,7 @@ EOF;
     protected function change_sound_volume_callback(array $data)
     {
         // start & stop device quickly, to check volume
-        if (in_array(GetValueInteger((int) 'state'), [2, 3, 8, 10, 15, 100])) {
+        if (in_array(GetValueInteger($this->GetIDForIdent('state')), [2, 3, 8, 10, 15, 100])) {
             $this->Start();
             $this->Stop();
         }
