@@ -1616,6 +1616,22 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     }
 
     /**
+     * Roborock Vacuum 1S segment clean.
+     *
+     * @param int $segmentid
+     *
+     * @return bool
+     */
+    public function Start_Segment_Clean(int $segmentid)
+    {
+        return $this->RequestData('app_segment_clean', [
+            'params' => [
+                $segmentid
+            ]
+        ]);
+    }
+
+    /**
      * webfront request actions.
      *
      * @param string $Ident

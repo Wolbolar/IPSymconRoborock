@@ -62,7 +62,7 @@ Mit dem Modul ist es möglich einen [Roborock](https://www.roborock.com/ "Roboro
 
 ### a. Laden des Moduls
 
-Die Webconsole von IP-Symcon mit _http://<IP-Symcon IP>:3777/console/_ öffnen. 
+Die Webconsole von IP-Symcon mit _http://{IP-Symcon IP}:3777/console/_ öffnen. 
 
 
 Anschließend oben rechts auf das Symbol für den Modulstore klicken
