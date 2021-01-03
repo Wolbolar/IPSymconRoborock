@@ -12,9 +12,21 @@ require_once __ROOT__ . '/libs/ips.constants.php';
  * Xiaomi Mi Vacuum Cleaner.
  *
  * @ToDo Read Token (Xiaomi Mi App?)
+ *
+ * a very useful API documentation: https://github.com/marcelrv/XiaomiRobotVacuumProtocol
+ *
  */
 class Roborock extends IPSModule
 {
+    private const PROPERTY_FAN_POWER = 'fan_power';
+    private const PROPERTY_WATER_QUANTITY = 'water_quantity';
+
+    private const IDENT_FAN_POWER = 'fan_power';
+    private const IDENT_WATER_QUANTITY = 'water_quantity';
+    private const IDENT_WATER_BOX_STATUS = 'water_box_status';
+    private const IDENT_WATER_BOX_CARRIAGE_STATUS = 'water_box_carriage_status';
+
+
     // state code mapper
     protected $state_codes = [
         0   => 'Unknown',
@@ -58,7 +70,11 @@ class Roborock extends IPSModule
         17 => 'Side brush failure',
         18 => 'Suction fan failure',
         19 => 'Unpowered charging station',
-        20 => 'Unknown'
+        20 => 'Unknown',
+        21 => 'Vertical bumper pressed',
+        22 => 'Dock locator dirty',
+        23 => 'Dock location beacon lost',
+        24 => 'No-go zone detected'
     ];
 
     protected $push_notifications = [
@@ -112,7 +128,8 @@ class Roborock extends IPSModule
         // register public properties
         $this->RegisterPropertyString('ip', '');
         $this->RegisterPropertyString('token', '');
-        $this->RegisterPropertyBoolean('fan_power', false);
+        $this->RegisterPropertyBoolean(self::PROPERTY_FAN_POWER, false);
+        $this->RegisterPropertyBoolean(self::PROPERTY_WATER_QUANTITY, false);
         $this->RegisterPropertyBoolean('error_code', false);
         $this->RegisterPropertyBoolean('consumables', false);
         $this->RegisterPropertyBoolean('consumables_separate', false);
@@ -185,7 +202,7 @@ class Roborock extends IPSModule
             '',
             '',
             0,
-            20,
+            0,
             0,
             0,
             1,
@@ -198,7 +215,7 @@ class Roborock extends IPSModule
             '',
             '',
             0,
-            15,
+            0,
             0,
             0,
             1,
@@ -221,6 +238,14 @@ class Roborock extends IPSModule
         );
 
         $this->RegisterProfile('Roborock.Fanpower', 'Speedo', '', ' %', 0, 100, 1, 0, 1);
+        $this->RegisterProfileAssociation('Roborock.WaterQuantity', '', '', '', 0, 0, 0, 0, VARIABLETYPE_INTEGER,
+                               [
+                                   [200, $this->Translate('Off'), '', -1],
+                                   [201, $this->Translate('Low'), '', -1],
+                                   [202, $this->Translate('Medium'), '', -1],
+                                   [203, $this->Translate('High'), '', -1],
+                                   [204, $this->Translate('Customize (Auto)'), '', -1],
+                               ]);
         $this->RegisterProfile('Roborock.Cleanarea', 'Shuffle', '', ' ' . chr(109) . chr(178), 0, 0, 0, 1, 2);
         $this->RegisterProfile('Roborock.Totalcleans', 'Gauge', '', '', 0, 0, 0, 2, 1);
         $this->RegisterProfile('Roborock.Volume', 'Speaker', '', ' %', 0, 100, 1, 0, 1);
@@ -257,11 +282,25 @@ class Roborock extends IPSModule
         $this->RegisterVariableInteger('battery', $this->Translate('Battery'), 'Roborock.Battery', $this->_getPosition());
 
         // fan power
-        if ($this->ReadPropertyBoolean('fan_power')) {
-            $this->RegisterVariableInteger('fan_power', $this->Translate('Fan Power'), 'Roborock.Fanpower', $this->_getPosition());
-            $this->EnableAction('fan_power');
+        if ($this->ReadPropertyBoolean(self::PROPERTY_FAN_POWER)) {
+            $this->RegisterVariableInteger(self::IDENT_FAN_POWER, $this->Translate('Fan Power'), 'Roborock.Fanpower', $this->_getPosition());
+            $this->EnableAction(self::IDENT_FAN_POWER);
         } else {
-            $this->UnregisterVariable('fan_power');
+            $this->UnregisterVariable(self::IDENT_FAN_POWER);
+        }
+
+        // water quantity
+        if ($this->ReadPropertyBoolean(self::PROPERTY_WATER_QUANTITY)) {
+            $this->RegisterVariableInteger(self::IDENT_WATER_QUANTITY, $this->Translate('Water Quantity'), 'Roborock.WaterQuantity', $this->_getPosition());
+            $this->RegisterVariableBoolean(self::IDENT_WATER_BOX_STATUS, $this->Translate('Water Box installed'), '~Switch', $this->_getPosition());
+            $this->RegisterVariableBoolean(self::IDENT_WATER_BOX_CARRIAGE_STATUS, $this->Translate('Water Box Carriage Status'), '~Switch', $this->_getPosition());
+            $this->EnableAction(self::IDENT_WATER_QUANTITY);
+            $this->EnableAction(self::IDENT_WATER_BOX_STATUS);
+            $this->EnableAction(self::IDENT_WATER_BOX_CARRIAGE_STATUS);
+        } else {
+            $this->UnregisterVariable(self::IDENT_WATER_QUANTITY);
+            $this->UnregisterVariable(self::IDENT_WATER_BOX_STATUS);
+            $this->UnregisterVariable(self::IDENT_WATER_BOX_CARRIAGE_STATUS);
         }
 
         // volume
@@ -275,7 +314,6 @@ class Roborock extends IPSModule
         // error code
         if ($this->ReadPropertyBoolean('error_code')) {
             $this->RegisterVariableInteger('error_code', $this->Translate('Error Code'), 'Roborock.Errorcode', $this->_getPosition());
-            //$this->EnableAction('error_code');
         } else {
             $this->UnregisterVariable('error_code');
         }
@@ -1186,9 +1224,34 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
      */
     public function Set_Fan_Power(int $power)
     {
-        $this->SetRoborockValue('fan_power', $power);
+        $this->SetRoborockValue(self::IDENT_FAN_POWER, $power);
         return $this->RequestData('set_custom_mode', [
             'params' => [$power]
+        ]);
+    }
+
+    /**
+     * Get the water quantity control during the cleaning process.
+     *
+     * @return int
+     */
+    public function Get_Water_Quantity_Control()
+    {
+        return $this->RequestData('get_water_box_custom_mode');
+    }
+
+    /**
+     * set the water quantity control during the cleaning process. (Quiet=38, Balanced=60, Turbo=77, Full Speed=90).
+     *
+     * @param int $power
+     *
+     * @return bool
+     */
+    public function Set_Water_Quantity_Control(int $mode)
+    {
+        $this->SetRoborockValue(self::IDENT_WATER_QUANTITY, $mode);
+        return $this->RequestData('get_water_box_custom_mode', [
+            'params' => [$mode]
         ]);
     }
 
@@ -1424,12 +1487,12 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     /**
      * Roborock Vacuum 2 go to coordinates.
      *
-     * @param float $x
-     * @param float $y
+     * @param int $x
+     * @param int $y
      *
      * @return bool
      */
-    public function GotoTarget(float $x, float $y)
+    public function GotoTarget(int $x, int $y)
     {
         return $this->RequestData('app_goto_target', [
             'params' => [
@@ -1611,7 +1674,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     {
         $this->SetRoborockValue('volume', $volume);
         return $this->RequestData('change_sound_volume', [
-            'params' => [(int) $volume]
+            'params' => [$volume]
         ]);
     }
 
@@ -1628,6 +1691,21 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
             'params' => [
                 $segmentid
             ]
+        ]);
+    }
+
+    /**
+     * segment clean Ex
+     *
+     * @param string json encoded array of segmentids
+     *
+     * @return bool
+     */
+    public function Start_Segment_Clean_Ex(string $segmentIds)
+    {
+        $segments = json_decode($segmentIds, true);
+        return $this->RequestData('app_segment_clean', [
+            'params' => $segments
         ]);
     }
 
@@ -1672,8 +1750,11 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
             case 'volume':
                 $this->Set_SoundVolume($Value);
                 break;
-            case 'fan_power':
+            case self::IDENT_FAN_POWER:
                 $this->Set_Fan_Power($Value);
+                break;
+            case self::IDENT_WATER_QUANTITY:
+                $this->Set_Water_Quantity_Control($Value);
                 break;
             default:
                 $this->_debug('request action', 'Invalid $Ident <' . $Ident . '>');
@@ -2188,9 +2269,14 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
                                 'label' => 'Enabled options'
                             ],
                             [
-                                'name'    => 'fan_power',
+                                'name'    => self::PROPERTY_FAN_POWER,
                                 'type'    => 'CheckBox',
                                 'caption' => 'Fan Power'
+                            ],
+                            [
+                                'name'    => self::PROPERTY_WATER_QUANTITY,
+                                'type'    => 'CheckBox',
+                                'caption' => 'Water Quantity'
                             ],
                             [
                                 'name'    => 'error_code',
@@ -3170,56 +3256,69 @@ EOF;
      *
      * @return array
      */
-    protected function get_status_callback(array $data)
+    protected function get_status_callback(array $data): array
     {
-        if (isset($data['result'][0])) {
-            // update values
-            $battery = intval($data['result'][0]['battery']);
-            $this->SetRoborockValue('battery', $battery);
 
-            $state = intval($data['result'][0]['state']);
-            if ($state == 8 && $battery == 100) {
-                $this->SetRoborockValue('state', 100);
-            } else {
-                $this->SetRoborockValue('state', $state);
-            }
-
-            $clean_area = floatval($data['result'][0]['clean_area']) / 1000000; // cm2 -> m2
-            $this->SetRoborockValue('clean_area', $clean_area);
-
-            $clean_time = $this->_convertToUnixtime(intval($data['result'][0]['clean_time'])); // sec
-            $this->SetRoborockValue('clean_time', $clean_time);
-
-            $error_code = intval($data['result'][0]['error_code']);
-            $this->SetRoborockValue('error_code', $error_code);
-
-            $fan_power = intval($data['result'][0]['fan_power']);
-            $this->SetRoborockValue('fan_power', $fan_power);
-
-            // send push notifications
-            $this->SendPushNotification($state);
-            $this->SendPushNotification('errors', $error_code);
-
-            // return values
-            return [
-                'state'      => $state,
-                'battery'    => $battery,
-                'clean_area' => $clean_area,
-                'clean_time' => $clean_time,
-                'error_code' => $error_code,
-                'fan_power'  => $fan_power
-            ];
+        if (!isset($data['result'][0])) {
+            return [];
         }
 
-        // fallback
-        return [
-            'state'      => null,
-            'battery'    => null,
-            'clean_area' => null,
-            'clean_time' => null,
-            'error_code' => null,
-            'fan_power'  => null
-        ];
+        $result = $data['result'][0];
+
+        // update values
+        $ret = [];
+        $battery = (int) $result['battery'];
+        $this->SetRoborockValue('battery', $battery);
+        $ret['battery'] = $battery;
+
+        $state = (int) $result['state'];
+        if ($state === 8 && $battery === 100) {
+            $this->SetRoborockValue('state', 100);
+        } else {
+            $this->SetRoborockValue('state', $state);
+        }
+        $ret['state'] = $state;
+
+        $clean_area = (float) ($result['clean_area'] / 1000000); // cm2 -> m2
+        $this->SetRoborockValue('clean_area', $clean_area);
+        $ret['clean_area'] = $clean_area;
+
+        $clean_time = $this->_convertToUnixtime((int) $result['clean_time']); // sec
+        $this->SetRoborockValue('clean_time', $clean_time);
+        $ret['clean_time'] = $clean_time;
+
+        $error_code = (int) $result['error_code'];
+        $this->SetRoborockValue('error_code', $error_code);
+        $ret['error_code'] = $error_code;
+
+        $fan_power = (int) $result['fan_power'];
+        $this->SetRoborockValue(self::IDENT_FAN_POWER, $fan_power);
+        $ret['fan_power'] = $fan_power;
+
+        if (isset($result['water_box_mode'])){
+            $water_box_mode = (int) $result['water_box_mode'];
+            $this->SetRoborockValue(self::IDENT_WATER_QUANTITY, $water_box_mode);
+            $ret['water_box_mode'] = $water_box_mode;
+        }
+
+        if (isset($result['water_box_status'])) {
+            $water_box_status = (bool) $result['water_box_status'];
+            $this->SetRoborockValue(self::IDENT_WATER_BOX_STATUS, $water_box_status);
+            $ret['water_box_status'] = $water_box_status;
+        }
+
+        if (isset($result['water_box_carriage_status'])) {
+            $water_box_carriage_status = (bool) $result['water_box_carriage_status'];
+            $this->SetRoborockValue(self::IDENT_WATER_BOX_CARRIAGE_STATUS, $water_box_carriage_status);
+            $ret['water_box_carriage_status'] = $water_box_carriage_status;
+        }
+
+        // send push notifications
+        $this->SendPushNotification($state);
+        $this->SendPushNotification('errors', $error_code);
+
+        // return values
+        return $ret;
     }
 
     /**
@@ -3592,9 +3691,29 @@ EOF;
     {
         if (isset($data['result'][0])) {
             $fan_power = $data['result'][0];
-            $this->SetRoborockValue('fan_power', $fan_power);
+            $this->SetRoborockValue(self::IDENT_FAN_POWER, $fan_power);
 
             return $fan_power;
+        }
+
+        // fallback
+        return 0;
+    }
+
+    /**
+     * Callback: Water Box Custom Mode.
+     *
+     * @param array $data
+     *
+     * @return int
+     */
+    protected function get_water_box_custom_mode_callback(array $data)
+    {
+        if (isset($data['result'][0])) {
+            $water_flow_mode = $data['result'][0];
+            $this->SetRoborockValue(self::IDENT_WATER_QUANTITY, $water_flow_mode);
+
+            return $water_flow_mode;
         }
 
         // fallback
