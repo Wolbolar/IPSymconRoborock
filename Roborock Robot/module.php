@@ -238,7 +238,7 @@ class Roborock extends IPSModule
         );
 
         $this->RegisterProfile('Roborock.Fanpower', 'Speedo', '', ' %', 0, 100, 1, 0, 1);
-        $this->RegisterProfileAssociation('Roborock.WaterQuantity', '', '', '', 0, 0, 0, 0, VARIABLETYPE_INTEGER,
+        $this->RegisterProfileAssociation('Roborock.WaterQuantity', 'Drops', '', '', 0, 0, 0, 0, VARIABLETYPE_INTEGER,
                                [
                                    [200, $this->Translate('Off'), '', -1],
                                    [201, $this->Translate('Low'), '', -1],
@@ -295,8 +295,6 @@ class Roborock extends IPSModule
             $this->RegisterVariableBoolean(self::IDENT_WATER_BOX_STATUS, $this->Translate('Water Box installed'), '~Switch', $this->_getPosition());
             $this->RegisterVariableBoolean(self::IDENT_WATER_BOX_CARRIAGE_STATUS, $this->Translate('Water Box Carriage Status'), '~Switch', $this->_getPosition());
             $this->EnableAction(self::IDENT_WATER_QUANTITY);
-            $this->EnableAction(self::IDENT_WATER_BOX_STATUS);
-            $this->EnableAction(self::IDENT_WATER_BOX_CARRIAGE_STATUS);
         } else {
             $this->UnregisterVariable(self::IDENT_WATER_QUANTITY);
             $this->UnregisterVariable(self::IDENT_WATER_BOX_STATUS);
@@ -1250,7 +1248,7 @@ Roborock_Reset_Sensors(' . $this->InstanceID . ');
     public function Set_Water_Quantity_Control(int $mode)
     {
         $this->SetRoborockValue(self::IDENT_WATER_QUANTITY, $mode);
-        return $this->RequestData('get_water_box_custom_mode', [
+        return $this->RequestData('set_water_box_custom_mode', [
             'params' => [$mode]
         ]);
     }
