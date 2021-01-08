@@ -7,5 +7,6 @@
     "parentRequirements": ["{C8792760-65CF-4C53-B5C7-A30FCC84FEFE}"],
     "childRequirements": ["{36FF43CE-F065-DD20-F1A8-A7C99C25D7A2}"],
     "implemented": ["{7A1272A4-CBDB-46EF-BFC6-DCF4A53D2FC7}", "{F7DC50D6-DCE6-27CE-49B2-A363593EBB3B}"],
+    "url": "https://github.com/Wolbolar/IPSymconRoborock/blob/master/README.md",
     "prefix": "RoborockIO"
 }

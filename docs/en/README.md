@@ -29,6 +29,7 @@ With the module it is possible to control a [Roborock](https://www.roborock.com/
 - Show and set timers
 - Remote remote control
 - Adjusting the fan power
+- Adjusting the water quantity  
 - Adjust the volume
 - Locate the vacuum cleaner
 - Switch on / off Do not Disturb Mode (DND) and set times
@@ -53,7 +54,7 @@ With the module it is possible to control a [Roborock](https://www.roborock.com/
 	  
 ## 2. Requirements
 
-  - IP-Symcon 4.3
+  - IP-Symcon 5.1
   - MI App (Xiaomi)
   - Roborock vacuum cleaner robot (Xiaomi)
 
