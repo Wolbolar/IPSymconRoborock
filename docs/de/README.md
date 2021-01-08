@@ -29,6 +29,7 @@ Mit dem Modul ist es möglich einen [Roborock](https://www.roborock.com/ "Roboro
  - Timer anzeigen und setzten
  - Remote Fernsteuerung
  - Einstellen der Lüfterleistung
+ - Einstellen der Wassermenge  
  - Einstellen der Lautstärke
  - Lokalisieren des Saugers
  - Do not Disturb Mode (DND) ein / auschalten und Zeiten einstellen
@@ -589,7 +590,9 @@ _**Fährt zu den angegebenen Koordinaten**_
  
  Parameter _$x_ __*X-Koordinate*__ der Zielposition
  
- Parameter _$y_ __*Y-Koordinate*__ der Zielposition  
+ Parameter _$y_ __*Y-Koordinate*__ der Zielposition 
+
+Hinweis: die Basisstation hat die Koordinaten 2550, 2550. Eine Einheit entspricht ungefähr einem Millimeter.
 
 
 ###  b. GUIDs und Datenaustausch:
