@@ -4,7 +4,7 @@
 ![Code](https://img.shields.io/badge/Code-PHP-blue.svg)
 [![StyleCI](https://github.styleci.io/repos/123504524/shield?branch=master)](https://github.styleci.io/repos/123504524)
 
-Module for IP Symcon version 4.3 or higher
+Module for IP Symcon version 5.1 or higher
 
 ## Documentation
 

@@ -207,7 +207,6 @@ class RoborockIO extends IPSModule
         $this->token = $this->_validateToken($payload->token);
         $this->ip = $payload->ip;
         $message = [
-            'id'     => null,
             'method' => $payload->method,
             'params' => $payload->params
         ];
@@ -227,7 +226,8 @@ class RoborockIO extends IPSModule
             // send HELLO
             if ($this->SendHello()) {
                 // set message id
-                $message['id'] = $this->_getMessageId();
+                $messageId = $this->_getMessageId();
+                $message['id'] = $messageId;
 
                 $this->_debug('socket [message]', json_encode($message));
 
@@ -244,7 +244,7 @@ class RoborockIO extends IPSModule
 
                 // receive data from socket
                 $buffer = '';
-                if ($bytes = @socket_recvfrom($this->socket, $buffer, 4096, 0, $remote_ip, $remote_port) !== false) {
+                if (($bytes = @socket_recvfrom($this->socket, $buffer, 4096, 0, $remote_ip, $remote_port)) !== false) {
                     $this->_debug('socket [receive]', $bytes . ' bytes from ' . $remote_ip . ':' . $remote_port);
 
                     // parse message
@@ -255,22 +255,24 @@ class RoborockIO extends IPSModule
                     $this->_debug('raw data', $data_decrypted);
 
                     // validate json response
-                    if ($result = $this->_validateResponse($data_decrypted)) {
+                    if ($result = $this->_validateResponse($data_decrypted, $messageId)) {
                         $this->attempts = 0;
                         return $result;
+                    }
+
+                    if ($this->attempts < 3) {
+                        return $this->Retry($payload);
                     } // on invalid response, retry attempt
-                    elseif ($this->attempts < 3) {
-                        return $this->Retry($payload);
-                    } // return false
-                    else {
-                        return false;
-                    }
-                } else {
-                    if ($this->attempts == 1) {
-                        return $this->Retry($payload);
-                    }
-                    $this->SocketErrorHandler();
+                    // return false
+                    return false;
+
                 }
+
+                if ($this->attempts === 1) {
+                    return $this->Retry($payload);
+                }
+
+                $this->SocketErrorHandler();
             }
         }
 
@@ -509,13 +511,13 @@ class RoborockIO extends IPSModule
      *
      * @return array|bool|mixed|string
      */
-    private function _validateResponse(string $json)
+    private function _validateResponse(string $json, int $MessageId)
     {
         $result = false;
         $data = @json_decode($json, true);
 
         // validate json
-        if ($jsonErrCode = json_last_error() !== JSON_ERROR_NONE) {
+        if (($jsonErrCode = json_last_error()) !== JSON_ERROR_NONE) {
             $jsonErrMsg = $this->_jsonLastErrorMsg();
             $this->_debug('data', 'json is not valid. Error: ' . $jsonErrMsg);
             if ($jsonErrCode == JSON_ERROR_CTRL_CHAR) {
@@ -537,6 +539,11 @@ class RoborockIO extends IPSModule
             $this->_debug('data [error]', 'no json received');
             $result = [
                 'error' => 'no json data received!'
+            ];
+        } elseif ($result['id'] !== $MessageId){
+            $this->_debug('data [error]', sprintf('Message Id not correct. Expected: %s, Received: %s', $MessageId, $result['id']));
+            $result = [
+                'error' => $result
             ];
         }
 
